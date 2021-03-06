@@ -54,7 +54,7 @@ public class WaveController : MonoBehaviour
         GameObject enemyGO = Instantiate (enemy, spawnPoints [pos].position, Quaternion.identity) as GameObject;
         Creep newCreep = enemyGO.GetComponent<Creep> ();
         newCreep.SetLinePosition (pos + 1);
-        ec.enemies.Add (newCreep);
+        ec.creeps.Add (newCreep);
         GameEvents.current.EnemyAppear ();
     }
 }

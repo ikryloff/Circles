@@ -52,9 +52,9 @@ public class UIManager : MonoBehaviour
         touchController = ObjectsHolder.Instance.touchController;
         spells = ObjectsHolder.Instance.spells;
         timeManager = FindObjectOfType<TimeManager> ();
-        speedButton.RegisterCallback<ClickEvent> (ev => SpeedGame ());
-        spellsButton.RegisterCallback<ClickEvent> (ev => ToggleSchoolList ());
-        closePanelButton.RegisterCallback<ClickEvent> (ev => ToggleSchoolList ());
+        speedButton.clicked += SpeedGame;
+        spellsButton.clicked += ToggleSchoolList;
+        closePanelButton.clicked += ToggleSchoolList;
         magicPanelIsOn = true;
         ToggleSchoolList ();
         CleanMessage ();
@@ -69,6 +69,11 @@ public class UIManager : MonoBehaviour
     public void SpeedGame()
     {
         timeManager.TurnTime ();
+    }
+
+    public void Test()
+    {
+        SetMessage ("Test");
     }
 
     public void SetMessage( string mess )
@@ -90,8 +95,8 @@ public class UIManager : MonoBehaviour
     {
         if ( magicPanelIsOn ) // if we need to close
         {
-            timeManager.PauseGameOff ();
             touchController.SetSkillBoardState (false);
+            timeManager.PauseGameOff ();
             magicPanel.style.display = DisplayStyle.None;
             spellsButton.style.display = DisplayStyle.Flex;
             messageScreen.style.display = DisplayStyle.Flex;
@@ -99,8 +104,8 @@ public class UIManager : MonoBehaviour
         }
         else
         {
-            timeManager.PauseGameOn();
             touchController.SetSkillBoardState (true);
+            timeManager.PauseGameOn();
             magicPanel.style.display = DisplayStyle.Flex;
             spellsButton.style.display = DisplayStyle.None;
             messageScreen.style.display = DisplayStyle.None;

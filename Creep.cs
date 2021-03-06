@@ -86,7 +86,7 @@ public class Creep : MonoBehaviour, IDamageable
     {
         ec.RemoveCreepFromEnemyList (this);
         linePosition -= 1;
-        sprite.sortingOrder = linePosition - 1;
+        sprite.sortingOrder = linePosition;
         creepTransform.position = new Vector3 (creepTransform.position.x, creepTransform.position.y + Constants.CELL_HEIGHT, creepTransform.position.z);
         ec.AddCreepToEnemyList (this);
     }
@@ -95,7 +95,7 @@ public class Creep : MonoBehaviour, IDamageable
     {
         ec.RemoveCreepFromEnemyList (this);
         linePosition += 1;
-        sprite.sortingOrder = linePosition + 1;
+        sprite.sortingOrder = linePosition;
         creepTransform.position = new Vector3 (creepTransform.position.x, creepTransform.position.y - Constants.CELL_HEIGHT, creepTransform.position.z);
         ec.AddCreepToEnemyList (this);
     }
@@ -110,6 +110,7 @@ public class Creep : MonoBehaviour, IDamageable
             creepAnimation.StopFightAnimation ();
             healthBarGO.SetActive (false);
             ec.RemoveCreepFromEnemyList (this);
+            ec.creeps.Remove (this);
             xpPoints.AddPoints (xp, transform.position.x);
             MakeDeath ();        
         }
@@ -223,6 +224,7 @@ public class Creep : MonoBehaviour, IDamageable
         {
             targetTower.CalcDamage (damage);
         }
+        targetTower.UpdateTargetAfterHit (this);
     }
 
     private IEnumerator FireAfterAnimation( float damage )

@@ -69,6 +69,7 @@ public class Wizard : MonoBehaviour
         if ( defencePoints <= 0 )
         {
             defencePoints = 0;
+            uI.SetHealthValue (0, defencePoints);
             print ("GameOver");
 
             temp = Time.time - temp;

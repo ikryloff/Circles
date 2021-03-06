@@ -165,8 +165,6 @@ public class TowerAI : Tower
         {
             enemy.CalcDamage (damage);
         }
-
-
     }
 
     public override void CalcDamage( float damage )
@@ -196,6 +194,13 @@ public class TowerAI : Tower
         if ( impactName != "" )
             impactPref = GameAssets.instance.GetAssetByString (impactName);
 
+    }
+
+    public override void UpdateTargetAfterHit(Creep creep )
+    {
+        if ( creep == targetCreep )
+            return;
+        UpdateTarget ();
     }
 
 }

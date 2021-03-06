@@ -2,7 +2,7 @@
 
 public class TowerWizard : Tower
 {
-
+    private FirePoints firePoints;
     public Wizard wizard;
     public Creep targetEnemy;
 
@@ -10,15 +10,29 @@ public class TowerWizard : Tower
     public override void Start()
     {
         base.Start ();
+        firePoints = ObjectsHolder.Instance.firePoints;
         isAI = false;
         AddTower ();
         CellPosition = -1;
     }
-    
+
 
     public override void Attack( float _damage, string school, string spellTarget, GameObject bullet )
     {
+        if ( spellTarget == Constants.SPELL_TARGET_ALL )
+        {
+            for ( int i = 0; i < creepsInLine.Count; i++ )
+            {
+                if ( creepsInLine[i] != null )
+                {
+                    BulletHit (creepsInLine [i], _damage, bullet);
+                }
+            }
+            return;
+        }
+
         targetEnemy = GetTarget (spellTarget);
+
         if ( targetEnemy == null )
         {
             BulletFly (GetEmptyTarget (LinePosition), bullet);
@@ -39,7 +53,7 @@ public class TowerWizard : Tower
         {
             int rand = Random.Range (0, creepsInLine.Count);
             target = creepsInLine [rand];
-        }
+        }        
         else
         {
             float temp = float.MaxValue;
@@ -57,14 +71,14 @@ public class TowerWizard : Tower
         return target;
     }
 
-    public override void CalcDamage( float _damage)
+    public override void CalcDamage( float _damage )
     {
         wizard.CalcDamage (_damage);
     }
 
     private void BulletFly( Transform target, GameObject bulletPref )
     {
-        GameObject bulletGO = Instantiate (bulletPref, firePoint.position, Quaternion.identity) as GameObject;
+        GameObject bulletGO = Instantiate (bulletPref, firePoints.GetRandomPoint ().position, Quaternion.identity) as GameObject;
         Bullet bullet = bulletGO.GetComponent<Bullet> ();
         if ( bullet != null )
         {
@@ -75,12 +89,12 @@ public class TowerWizard : Tower
 
     private void BulletHit( Creep creep, float _damage, GameObject bulletPref )
     {
-        GameObject bulletGO = Instantiate (bulletPref, firePoint.position, Quaternion.identity) as GameObject;
+        GameObject bulletGO = Instantiate (bulletPref, firePoints.GetRandomPoint ().position, Quaternion.identity) as GameObject;
         Bullet bullet = bulletGO.GetComponent<Bullet> ();
         if ( bullet != null )
         {
             bullet.SeekEnemy (creep, _damage);
         }
 
-    }   
+    }
 }

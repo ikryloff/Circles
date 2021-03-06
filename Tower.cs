@@ -23,6 +23,7 @@ public class Tower : MonoBehaviour, IDamageable
     public Transform firePoint;
     public Transform towerTransform;
     public List<Creep> creepsInLine;
+    public List<Creep> creeps;
 
     protected void Awake()
     {
@@ -33,12 +34,18 @@ public class Tower : MonoBehaviour, IDamageable
     {
         ec = ObjectsHolder.Instance.enemyController;
         creepsInLine = ec.lines [LinePosition].lineCreeps;
+        creeps = ec.creeps;
         UpdateTarget ();       
 
     }
 
     public virtual void UpdateTarget()
     {
+    }
+
+    public virtual void UpdateTargetAfterHit( Creep creep )
+    {
+        
     }
 
     public virtual void TowerDeath()

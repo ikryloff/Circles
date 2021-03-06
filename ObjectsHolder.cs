@@ -18,6 +18,7 @@ public class ObjectsHolder : MonoBehaviour
     public GameController GameController;
     public UIManager uIManager;
     public TouchController touchController;
+    public FirePoints firePoints;
 
 
 
@@ -43,6 +44,7 @@ public class ObjectsHolder : MonoBehaviour
         xpPoints = wizard.GetComponent<XPpoints> ();
         GameController = FindObjectOfType<GameController> ();
         uIManager = FindObjectOfType<UIManager> ();
+        firePoints = FindObjectOfType<FirePoints> ();
     }
 
 

@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
-    public List<Creep> enemies;
+    public List<Creep> creeps;
     public Line [] lines;
     public Transform [] spawns;
     SpawnPoint [] sp;

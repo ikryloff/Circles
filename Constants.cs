@@ -41,6 +41,7 @@ public class Constants
     // spell targets
     public static string SPELL_TARGET_RANDOM_IN_LINE = "RIL";
     public static string SPELL_TARGET_NEAREST_IN_LINE = "NIL";
+    public static string SPELL_TARGET_ALL = "ALL";
 
     //special spells
     public static string TOWER_CODE_SHIELD = "1212";
