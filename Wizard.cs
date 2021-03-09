@@ -11,25 +11,23 @@ public class Wizard : MonoBehaviour
     private float manaPoints;
     private float manaCicle;
     private float manaCicleRate;
-    private float manaRecoverPoints;
     public float temp;
 
     void Start()
     {
         uI = ObjectsHolder.Instance.uIManager;
         temp = Time.time;
-        defencePoints = 1000;
+        defencePoints = PlayerStats.GetPlayerDP ();
         manaPoints = PlayerStats.GetPlayerMP ();
         startHp = defencePoints;
         startMana = manaPoints;
         hp_norm = 1f;
         mana_norm = 1f;
-        manaRecoverPoints = 2f;
-        manaCicle = 5;
-        manaCicleRate = 5;
-        uI.SetHealthValue (hp_norm * 100, defencePoints);
+        manaCicle = 1f;
+        manaCicleRate = 1f;
+        uI.SetDefenceValue (hp_norm * 100, defencePoints);
         CalcMana ();
-        PrintSpellsIDList ();
+        //PrintSpellsIDList ();
     }
     private void Update()
     {
@@ -40,7 +38,7 @@ public class Wizard : MonoBehaviour
     {
         if ( manaCicle <= 0 )
         {
-            ManaRecover (manaRecoverPoints);
+            ManaRecover (PlayerStats.GetPlayerMPPS ());
             manaCicle = manaCicleRate;
         }
         manaCicle -= Time.deltaTime;
@@ -48,7 +46,7 @@ public class Wizard : MonoBehaviour
 
     public void ManaRecover( float mPoints )
     {
-        manaPoints += mPoints * PlayerStats.GetPlayerManaBonus ();
+        manaPoints += mPoints;
         if ( manaPoints > startMana )
         {
             manaPoints = startMana;
@@ -60,7 +58,8 @@ public class Wizard : MonoBehaviour
     {
         defencePoints -= damage;
         hp_norm = defencePoints / startHp;
-        uI.SetHealthValue (hp_norm * 100, defencePoints);
+        uI.SetDefenceValue (hp_norm * 100, defencePoints);
+        PlayerStats.SetPlayerDP ((int)defencePoints);
         CheckDefence ();
     }
 
@@ -69,7 +68,8 @@ public class Wizard : MonoBehaviour
         if ( defencePoints <= 0 )
         {
             defencePoints = 0;
-            uI.SetHealthValue (0, defencePoints);
+            uI.SetDefenceValue (0, defencePoints);
+            PlayerStats.SetPlayerDP ((int)defencePoints);
             print ("GameOver");
 
             temp = Time.time - temp;
@@ -87,7 +87,8 @@ public class Wizard : MonoBehaviour
     public void CalcMana()
     {
         mana_norm = manaPoints / startMana;
-        uI.SetManaValue (mana_norm * 100, manaPoints);
+        uI.SetManaValue (mana_norm * 100, (int)manaPoints);
+        PlayerStats.SetPlayerMP ((int)manaPoints);
 
     }
 

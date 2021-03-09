@@ -38,7 +38,7 @@ public class TouchController : MonoBehaviour
         return isSkillBoardOpened;
     }
 
-    public void SetSkillBoardState( bool isOn )
+    public void SetPauseState( bool isOn )
     {
         isSkillBoardOpened = isOn;
     }

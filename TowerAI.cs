@@ -150,7 +150,7 @@ public class TowerAI : Tower
 
     }
 
-    public void Fire( Creep enemy, float damage )
+    public void Fire( Creep creep, float damage )
     {
         if ( IsRanger )
         {
@@ -158,13 +158,14 @@ public class TowerAI : Tower
             Bullet bullet = bulletGO.GetComponent<Bullet> ();
             if ( bullet != null )
             {
-                bullet.SeekEnemy (enemy, damage);
+                bullet.SeekEnemy (creep, damage);
             }
         }
         else
         {
-            enemy.CalcDamage (damage);
+            creep.CalcDamage (damage);
         }
+        creep.GetClosestTowerAfterHit (this);
     }
 
     public override void CalcDamage( float damage )

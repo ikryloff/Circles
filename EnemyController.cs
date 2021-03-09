@@ -7,6 +7,8 @@ public class EnemyController : MonoBehaviour
     public Line [] lines;
     public Transform [] spawns;
     SpawnPoint [] sp;
+    public TowerWizard [] towerWizards;
+    public Tower [] sortedTowers;
 
     private void Awake()
     {
@@ -14,9 +16,19 @@ public class EnemyController : MonoBehaviour
         sp = FindObjectsOfType<SpawnPoint> ();
         SortSpawns (sp);
         SortLines (lines);
-
+        towerWizards = FindObjectsOfType<TowerWizard> ();
+        SortTowers ();
     }
 
+    // sorting wiz towers to find them by line
+    private void SortTowers()
+    {
+        sortedTowers = new Tower [towerWizards.Length + 1];
+        for ( int i = 0; i < towerWizards.Length; i++ )
+        {
+            sortedTowers [towerWizards [i].LinePosition] = towerWizards [i];
+        }
+    }
 
     private void SortSpawns( SpawnPoint [] _sp )
     {
@@ -61,7 +73,7 @@ public class EnemyController : MonoBehaviour
 
     public void AddCreepToEnemyList( Creep creep )
     {
-        lines [creep.GetLinePosition()].lineCreeps.Add (creep);
+        lines [creep.GetLinePosition ()].lineCreeps.Add (creep);
         GameEvents.current.EnemyAppear ();
     }
 
@@ -74,7 +86,7 @@ public class EnemyController : MonoBehaviour
     public Tower GetTargetTower( Creep creep )
     {
         List<Tower> twrs = lines [creep.GetLinePosition ()].lineTowers;
-        Tower target = null;
+        Tower target = sortedTowers[creep.GetLinePosition ()];
         float temp = float.MaxValue;
         for ( int i = 0; i < twrs.Count; i++ )
         {
@@ -94,8 +106,8 @@ public class EnemyController : MonoBehaviour
         Creep target = null;
         float temp = float.MaxValue;
         for ( int i = 0; i < creeps.Count; i++ )
-        {            
-            float dist = Mathf.Abs (tower.towerTransform.position.x - creeps[i].creepTransform.position.x);
+        {
+            float dist = Mathf.Abs (tower.towerTransform.position.x - creeps [i].creepTransform.position.x);
             if ( dist <= temp )
             {
                 target = creeps [i];

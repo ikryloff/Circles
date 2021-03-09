@@ -7,43 +7,60 @@ public class UIManager : MonoBehaviour
     TouchController touchController;
     private bool magicPanelIsOn;
     Spells spells;
-    Button quitButton;
+    Button menuButton;
     Button speedButton;
     Button spellsButton;
     Button closePanelButton;
     VisualElement magicPanel;
     VisualElement messageScreen;
     VisualElement manaBar;
-    VisualElement healthBar;
+    VisualElement defenceBar;
+    VisualElement header;
     Label messageLabel;
     Label manaValue;
-    Label healthValue;
+    Label defenceValue;
     Label spellsNumber;
     Label xPoints;
-    public UIDocument uIDocument;
+    [SerializeField]
+    private UIDocument uiGame;
+    [SerializeField]
+    private UIDocument uiMenu;
     public StyleSheet unityStyleSheet;
     private UISpellsManager uISpellsManager;
+    private UIMenuManager uIMenuManager;
+    private UIInfoPanel uIInfoPanel;
+
+    private int defencePoints;
+    private int manaPoints;
+    private int xpPoints;
 
     private void OnEnable()
     {
         uISpellsManager = GetComponent<UISpellsManager> ();
-        uIDocument = FindObjectOfType<UIDocument> ();
-        var root = uIDocument.rootVisualElement;
-        uISpellsManager.SetRootAndInit (root);
-        quitButton = root.Query<Button> ("quit");
-        speedButton = root.Query<Button> ("speed");
-        spellsButton = root.Query<Button> ("spells-button");
-        closePanelButton = root.Query<Button> ("close-panel-button");
-        magicPanel = root.Query<VisualElement> ("magic-panel");
-        messageScreen = root.Query<VisualElement> ("message-screen");
-        healthBar = root.Query<VisualElement> ("health-bar-line");
-        manaBar = root.Query<VisualElement> ("mana-bar-line");
-        messageLabel = root.Query<Label> ("message");
-        manaValue = root.Query<Label> ("mana-bar-value");
-        healthValue = root.Query<Label> ("health-bar-value");
-        spellsNumber = root.Query<Label> ("spells-number");
-        xPoints = root.Query<Label> ("exp-number");
-        quitButton.RegisterCallback<ClickEvent> (ev => QuitGame ());
+        uIMenuManager = GetComponent<UIMenuManager> ();
+        uIInfoPanel = GetComponent<UIInfoPanel> ();
+        var rootGameUI = uiGame.rootVisualElement;
+        uISpellsManager.SetRootAndInit (rootGameUI);
+        uIInfoPanel.SetRootAndInit (rootGameUI);
+        var rootMenuUI = uiMenu.rootVisualElement;
+        uIMenuManager.SetRootAndInit (rootMenuUI);
+
+        menuButton = rootGameUI.Query<Button> ("menu");
+        speedButton = rootGameUI.Query<Button> ("speed");
+        spellsButton = rootGameUI.Query<Button> ("spells-button");
+        closePanelButton = rootGameUI.Query<Button> ("close-panel-button");
+
+        magicPanel = rootGameUI.Query<VisualElement> ("magic-panel");
+        messageScreen = rootGameUI.Query<VisualElement> ("message-screen");
+        defenceBar = rootGameUI.Query<VisualElement> ("defence-bar-line");
+        manaBar = rootGameUI.Query<VisualElement> ("mana-bar-line");
+        header = rootGameUI.Query<VisualElement> ("header");
+
+        messageLabel = rootGameUI.Query<Label> ("message");
+        manaValue = rootGameUI.Query<Label> ("mana-bar-value");
+        defenceValue = rootGameUI.Query<Label> ("defence-bar-value");
+        spellsNumber = rootGameUI.Query<Label> ("spells-number");
+        xPoints = rootGameUI.Query<Label> ("exp-number");
     }
 
 
@@ -55,16 +72,18 @@ public class UIManager : MonoBehaviour
         speedButton.clicked += SpeedGame;
         spellsButton.clicked += ToggleSchoolList;
         closePanelButton.clicked += ToggleSchoolList;
+        menuButton.clicked += OpenMenu;
         magicPanelIsOn = true;
         ToggleSchoolList ();
         CleanMessage ();
         PrintSpellsQuantity ();
     }
 
-    public void QuitGame()
+    public void OpenMenu()
     {
-        Application.Quit ();
-    }
+        StopSpelling ();
+        uIMenuManager.OpenMenu ();
+    }   
 
     public void SpeedGame()
     {
@@ -95,20 +114,20 @@ public class UIManager : MonoBehaviour
     {
         if ( magicPanelIsOn ) // if we need to close
         {
-            touchController.SetSkillBoardState (false);
-            timeManager.PauseGameOff ();
+            StartSpelling ();
             magicPanel.style.display = DisplayStyle.None;
             spellsButton.style.display = DisplayStyle.Flex;
             messageScreen.style.display = DisplayStyle.Flex;
+            header.style.display = DisplayStyle.Flex;
             magicPanelIsOn = false;
         }
         else
         {
-            touchController.SetSkillBoardState (true);
-            timeManager.PauseGameOn();
+            StopSpelling ();
             magicPanel.style.display = DisplayStyle.Flex;
             spellsButton.style.display = DisplayStyle.None;
             messageScreen.style.display = DisplayStyle.None;
+            header.style.display = DisplayStyle.None;
             magicPanelIsOn = true;
             uISpellsManager.TurnTab (0);
             uISpellsManager.UpdateSpellBoard ();
@@ -121,14 +140,28 @@ public class UIManager : MonoBehaviour
         manaValue.text = Mathf.FloorToInt(points).ToString ();
     }
 
-    public void SetHealthValue( float value, float points )
+    public void SetDefenceValue( float value, float points )
     {
-        healthBar.style.width = Length.Percent (value);
-        healthValue.text = points.ToString ();
+        defenceBar.style.width = Length.Percent (value);
+        defenceValue.text = points.ToString ();        
     }
 
     public void SetXPoints( int value )
     {
         xPoints.text = value.ToString ();
     }
+
+    private void StopSpelling()
+    {
+        touchController.SetPauseState (true);
+        timeManager.PauseGameOn ();
+    }
+    public void StartSpelling()
+    {
+        touchController.SetPauseState (false);
+        timeManager.PauseGameOff ();
+    }
+
+   
+
 }

@@ -70,7 +70,7 @@ public class Creep : MonoBehaviour, IDamageable
         if ( !isInFight )
         {
             creepTransform.Translate (Vector2.left * speed * Time.deltaTime);
-            SeekTower ();
+            
         }        
     }    
 
@@ -156,6 +156,14 @@ public class Creep : MonoBehaviour, IDamageable
         print ("Update Tower");
     }
 
+    public void GetClosestTowerAfterHit(Tower tower)
+    {
+        if ( tower == targetTower )
+            return;
+        targetTower = ec.GetTargetTower (this);
+        print ("Update TowerAfterHit");
+    }
+
     public void CheckCollision()
     {
         if ( !isInFight && creepAnimation.IsFightAnimationIsOn () )
@@ -189,21 +197,15 @@ public class Creep : MonoBehaviour, IDamageable
         }
         fireCountDown -= Time.deltaTime;
     }
-
-    private void SeekTower()
-    {
-        if ( seekCountDown <= 0 )
-        {
-            GetClosestTower();
-            seekCountDown = seekRate;
-        }
-        seekCountDown -= Time.deltaTime;
-    }
+   
 
     private void Attack( int damage )
     {
         if ( targetTower == null )
+        {
+            GetClosestTower ();
             return;
+        }
         creepAnimation.FaceToAnimation (targetTower);
         creepAnimation.AttackAnimation (targetTower);
         StartCoroutine (FireAfterAnimation (damage));

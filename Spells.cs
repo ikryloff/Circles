@@ -12,13 +12,27 @@ public class Spells : MonoBehaviour
     private ObjectsHolder oh;
     private UIManager ui;
 
+    private int [] natureSchoolSpellList = { 7, 8, 9, 10, 11, 12, 13 };
+    private int [] natureSchoolCallllList = { 42, 43, 44, 45, 46, 47, 48 };
+    private int [] elementalSchoolSpellList = { 0, 1, 2, 3, 4, 5, 6 };
+    private int [] elementalSchoolCallList = { 35, 36, 37, 38, 39, 40, 41 };
+    private int [] demonologySchoolSpellList = { 14, 15, 16, 17, 18, 19, 20 };
+    private int [] demonologySchoolCallList = { 49, 50, 51, 52, 53, 54, 55 };
+    private int [] necromancySchoolSpellList = { 21, 22, 23, 24, 25, 26, 27 };
+    private int [] necromancySchoolCallList = { 56, 57, 58, 59, 60, 61, 62 };
+    private int [] defenciveSchoolSpellList = { 28, 29, 30, 31, 32, 33, 34 };
+    private int [] defenciveSchoolCallList = { 63, 64, 65, 66, 67, 68, 69 };
+
+
+   
+
     private Dictionary<string, Spell> spellsDictionary;
     private Dictionary<int, Spell> spellsIDDictionary;    
 
     private void Awake()
     {
         MakeSpellsDictionary ();
-        MakeSpellsIDDictionary ();
+        MakeSpellsIDDictionary ();       
     }
 
     private void MakeSpellsDictionary()
@@ -127,6 +141,49 @@ public class Spells : MonoBehaviour
     {
         ui.SetMessage (message);
     }
-   
+
+
+    public int[] GetNatureListByIndex(int index)
+    {
+        return index == 0 ? natureSchoolSpellList : natureSchoolCallllList; 
+    }
+
+    public int [] GetElementalListByIndex( int index )
+    {
+        return index == 0 ? elementalSchoolSpellList : elementalSchoolCallList;
+    }
+
+    public int [] GetDemonologyListByIndex( int index )
+    {
+        return index == 0 ? demonologySchoolSpellList : demonologySchoolCallList;
+    }
+
+    public int [] GetNecromancyListByIndex( int index )
+    {
+        return index == 0 ? necromancySchoolSpellList : necromancySchoolCallList;
+    }
+
+    public int [] GetDefenciveListByIndex( int index )
+    {
+        return index == 0 ? defenciveSchoolSpellList : defenciveSchoolCallList;
+    }
+
+    public int GetSchoolLearnedSpells( int [] spells , int [] calls)
+    {
+        int count = 0;
+
+        for ( int i = 0; i < spells.Length; i++ )
+        {
+            count += PlayerStats.GetPlayerSpellsValueByIndex(spells[i]);
+        }
+
+        for ( int i = 0; i < calls.Length; i++ )
+        {
+            count += PlayerStats.GetPlayerSpellsValueByIndex (calls [i]);
+        }
+
+        return count;
+    }
+
 }
 

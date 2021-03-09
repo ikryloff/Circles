@@ -9,7 +9,6 @@ public class UISpellsManager : MonoBehaviour
     private VisualElement infoContainer;
 
 
-
     private int tabSelector;
 
     Button info;
@@ -20,8 +19,8 @@ public class UISpellsManager : MonoBehaviour
     Button defence;
 
     Button [] tabs;
-    Button [] spells;
-    Button [] calls;
+    Button [] spellsButtons;
+    Button [] callsButtons;
 
     Button spell1;
     Button spell2;
@@ -41,18 +40,14 @@ public class UISpellsManager : MonoBehaviour
 
     Label schoolLabel;
 
+    private UIInfoPanel infoPanel;
+    private Spells spells;
 
-    private int [] natureSchoolSpellList = { 7, 8, 9, 10, 11, 12, 13 };
-    private int [] natureSchoolCallllList = { 42, 43, 44, 45, 46, 47, 48 };
-    private int [] elementalSchoolSpellList = { 0, 1, 2, 3, 4, 5, 6 };
-    private int [] elementalSchoolCallList = { 35, 36, 37, 38, 39, 40, 41 };
-    private int [] demonologySchoolSpellList = { 14, 15, 16, 17, 18, 19, 20 };
-    private int [] demonologySchoolCallList = { 49, 50, 51, 52, 53, 54, 55 };
-    private int [] necromancySchoolSpellList = { 21, 22, 23, 24, 25, 26, 27 };
-    private int [] necromancySchoolCallList = { 56, 57, 58, 59, 60, 61, 62 };
-    private int [] defenciveSchoolSpellList = { 28, 29, 30, 31, 32, 33, 34 };
-    private int [] defenciveSchoolCallList = { 63, 64, 65, 66, 67, 68, 69 };
 
+    private void Start()
+    {
+        spells = ObjectsHolder.Instance.spells;
+    }
 
     public void SetRootAndInit( VisualElement _root )
     {
@@ -62,6 +57,9 @@ public class UISpellsManager : MonoBehaviour
 
     private void Init()
     {
+        infoPanel = GetComponent<UIInfoPanel> ();
+        
+
         spellsContainer = root.Query<VisualElement> ("spells-container");
         spellContainer = root.Query<VisualElement> ("spell-container");
         infoContainer = root.Query<VisualElement> ("info-container");
@@ -83,7 +81,7 @@ public class UISpellsManager : MonoBehaviour
         spell5 = root.Query<Button> ("spell-level5-but");
         spell6 = root.Query<Button> ("spell-level6-but");
         spell7 = root.Query<Button> ("spell-level7-but");
-        spells = new Button [] { spell1, spell2, spell3, spell4, spell5, spell6, spell7 };
+        spellsButtons = new Button [] { spell1, spell2, spell3, spell4, spell5, spell6, spell7 };
 
         call1 = root.Query<Button> ("call-level1-but");
         call2 = root.Query<Button> ("call-level2-but");
@@ -92,7 +90,7 @@ public class UISpellsManager : MonoBehaviour
         call5 = root.Query<Button> ("call-level5-but");
         call6 = root.Query<Button> ("call-level6-but");
         call7 = root.Query<Button> ("call-level7-but");
-        calls = new Button [] { call1, call2, call3, call4, call5, call6, call7 };
+        callsButtons = new Button [] { call1, call2, call3, call4, call5, call6, call7 };
 
         
         info.clicked +=         delegate { TurnTab (0); };
@@ -103,13 +101,14 @@ public class UISpellsManager : MonoBehaviour
         defence.clicked +=      delegate { TurnTab (5); };
        
 
-    }
+    }    
 
     private void InfoPanelOn()
     {
         spellContainer.style.display = DisplayStyle.None;
         spellsContainer.style.display = DisplayStyle.None;
         infoContainer.style.display = DisplayStyle.Flex;
+        infoPanel.SetInfoPanelText ();
     }
 
     private void SpellsPanelOn()
@@ -127,19 +126,19 @@ public class UISpellsManager : MonoBehaviour
             int ca = callList [i];
             if ( PlayerStats.IsSpellInPlayerSpellsIDList (sp) )
             {
-                spells [i].style.backgroundColor = Color.green;
+                spellsButtons [i].style.backgroundColor = Color.green;
             }
             else
             {
-                spells [i].style.backgroundColor = Color.black;
+                spellsButtons [i].style.backgroundColor = Color.black;
             }
             if ( PlayerStats.IsSpellInPlayerSpellsIDList (ca) )
             {
-                calls [i].style.backgroundColor = Color.green;
+                callsButtons [i].style.backgroundColor = Color.green;
             }
             else
             {
-                calls [i].style.backgroundColor = Color.black;
+                callsButtons [i].style.backgroundColor = Color.black;
             }
 
         }
@@ -155,29 +154,29 @@ public class UISpellsManager : MonoBehaviour
                 schoolLabel.text = Localization.GetString ("info");
                 break;
             case 1:
-                spList = elementalSchoolSpellList;
-                caList = elementalSchoolCallList;
-                schoolLabel.text = Constants.ELEMENTAL;
+                spList = spells.GetElementalListByIndex(0);
+                caList = spells.GetElementalListByIndex (1);
+                schoolLabel.text = Localization.GetString ("elemental");
                 break;
             case 2:
-                spList = natureSchoolSpellList;
-                caList = natureSchoolCallllList;
-                schoolLabel.text = Constants.NATURE;
+                spList = spells.GetNatureListByIndex(0);
+                caList = spells.GetNatureListByIndex (1);
+                schoolLabel.text = Localization.GetString ("nature"); 
                 break;
             case 3:
-                spList = demonologySchoolSpellList;
-                caList = demonologySchoolCallList;
-                schoolLabel.text = Constants.DEMONOLOGY;
+                spList = spells.GetDemonologyListByIndex (0);
+                caList = spells.GetDemonologyListByIndex (1);
+                schoolLabel.text = Localization.GetString ("demonology"); 
                 break;
             case 4:
-                spList = necromancySchoolSpellList;
-                caList = necromancySchoolCallList;
-                schoolLabel.text = Constants.NECROMANCY;
+                spList = spells.GetNecromancyListByIndex (0);
+                caList = spells.GetNecromancyListByIndex (1);
+                schoolLabel.text = Localization.GetString ("necromancy");
                 break;
             case 5:
-                spList = defenciveSchoolSpellList;
-                caList = defenciveSchoolCallList;
-                schoolLabel.text = Constants.DEFENSIVE;
+                spList = spells.GetDefenciveListByIndex (0);
+                caList = spells.GetDefenciveListByIndex (1);
+                schoolLabel.text = Localization.GetString ("defencive");
                 break;
             default:
                 break;

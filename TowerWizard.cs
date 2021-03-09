@@ -95,6 +95,7 @@ public class TowerWizard : Tower
         {
             bullet.SeekEnemy (creep, _damage);
         }
+        creep.GetClosestTowerAfterHit (this);
 
     }
 }
