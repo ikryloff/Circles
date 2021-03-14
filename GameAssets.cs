@@ -22,18 +22,51 @@ public class GameAssets : MonoBehaviour
         {
             assets.Add (item.name, item);
         }
-    }    
+    }
 
 
-   public GameObject [] prefabs;
+    public GameObject [] prefabs;
 
-   
+    [SerializeField]
+    private Texture2D [] activeIcons = new Texture2D[77];
+    [SerializeField]
+    private Texture2D [] unactiveIcons = new Texture2D [77];
+    [SerializeField]
+    private Texture2D [] schemas = new Texture2D [77];
+    [SerializeField]
+    private Texture2D testIcon;
+
     // Methods
 
-    public GameObject GetAssetByString(string name )
+    public GameObject GetAssetByString( string name )
     {
         return assets [name];
     }
+
+    public Texture2D GetActiveIconByID( int id )
+    {
+        if ( activeIcons [id] )
+            return activeIcons [id];
+        else
+            return testIcon;
+    }
+
+    public Texture2D GetUnActiveIconByID( int id )
+    {
+        if ( unactiveIcons [id] )
+            return unactiveIcons [id];
+        else
+            return testIcon;
+    }
+
+    public Texture2D GetSchemaByID( int id )
+    {
+        if ( schemas [id] )
+            return schemas [id];
+        else
+            return testIcon;
+    }
+
 }
 
 

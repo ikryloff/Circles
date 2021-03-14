@@ -101,6 +101,15 @@ public class Spells : MonoBehaviour
         }
     }
 
+    public Spell GetSpellByID( int id)
+    {
+        if ( spellsIDDictionary.ContainsKey (id) )
+            return spellsIDDictionary [id];
+        else
+            return spellsIDDictionary [0];
+
+    }
+
     private void ExecuteTrapSpell( Spell spell, int top, int left )
     {
         buildingManager.BuildTrap (spell, new int [] { top + spell.targetCell [0], left + spell.targetCell [1] });
@@ -186,4 +195,5 @@ public class Spells : MonoBehaviour
     }
 
 }
+
 

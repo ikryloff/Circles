@@ -10,8 +10,7 @@ public class UIManager : MonoBehaviour
     Button menuButton;
     Button speedButton;
     Button spellsButton;
-    Button closePanelButton;
-    VisualElement magicPanel;
+    
     VisualElement messageScreen;
     VisualElement manaBar;
     VisualElement defenceBar;
@@ -25,6 +24,9 @@ public class UIManager : MonoBehaviour
     private UIDocument uiGame;
     [SerializeField]
     private UIDocument uiMenu;
+    [SerializeField]
+    private UIDocument uiSpellsPanel;
+
     public StyleSheet unityStyleSheet;
     private UISpellsManager uISpellsManager;
     private UIMenuManager uIMenuManager;
@@ -39,18 +41,21 @@ public class UIManager : MonoBehaviour
         uISpellsManager = GetComponent<UISpellsManager> ();
         uIMenuManager = GetComponent<UIMenuManager> ();
         uIInfoPanel = GetComponent<UIInfoPanel> ();
+
         var rootGameUI = uiGame.rootVisualElement;
-        uISpellsManager.SetRootAndInit (rootGameUI);
-        uIInfoPanel.SetRootAndInit (rootGameUI);
+
+        var rootSpellsUI = uiSpellsPanel.rootVisualElement;
+        uISpellsManager.SetRootAndInit (rootSpellsUI);
+        uIInfoPanel.SetRootAndInit (rootSpellsUI);
+
         var rootMenuUI = uiMenu.rootVisualElement;
         uIMenuManager.SetRootAndInit (rootMenuUI);
 
         menuButton = rootGameUI.Query<Button> ("menu");
         speedButton = rootGameUI.Query<Button> ("speed");
         spellsButton = rootGameUI.Query<Button> ("spells-button");
-        closePanelButton = rootGameUI.Query<Button> ("close-panel-button");
+        
 
-        magicPanel = rootGameUI.Query<VisualElement> ("magic-panel");
         messageScreen = rootGameUI.Query<VisualElement> ("message-screen");
         defenceBar = rootGameUI.Query<VisualElement> ("defence-bar-line");
         manaBar = rootGameUI.Query<VisualElement> ("mana-bar-line");
@@ -71,7 +76,7 @@ public class UIManager : MonoBehaviour
         timeManager = FindObjectOfType<TimeManager> ();
         speedButton.clicked += SpeedGame;
         spellsButton.clicked += ToggleSchoolList;
-        closePanelButton.clicked += ToggleSchoolList;
+        
         menuButton.clicked += OpenMenu;
         magicPanelIsOn = true;
         ToggleSchoolList ();
@@ -115,7 +120,7 @@ public class UIManager : MonoBehaviour
         if ( magicPanelIsOn ) // if we need to close
         {
             StartSpelling ();
-            magicPanel.style.display = DisplayStyle.None;
+            uISpellsManager.HideMagicPanel ();
             spellsButton.style.display = DisplayStyle.Flex;
             messageScreen.style.display = DisplayStyle.Flex;
             header.style.display = DisplayStyle.Flex;
@@ -124,7 +129,7 @@ public class UIManager : MonoBehaviour
         else
         {
             StopSpelling ();
-            magicPanel.style.display = DisplayStyle.Flex;
+            uISpellsManager.ShowMagicPanel ();
             spellsButton.style.display = DisplayStyle.None;
             messageScreen.style.display = DisplayStyle.None;
             header.style.display = DisplayStyle.None;

@@ -1,15 +1,22 @@
+using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public class UISpellsManager : MonoBehaviour
 {
+    
+
+    private UIManager uIManager;
+
     private VisualElement root;
     private VisualElement spellsContainer;
     private VisualElement spellContainer;
     private VisualElement infoContainer;
-
+    private VisualElement magicPanel;
 
     private int tabSelector;
+
+    Button closePanelButton;
 
     Button info;
     Button nature;
@@ -38,11 +45,17 @@ public class UISpellsManager : MonoBehaviour
     Button call6;
     Button call7;
 
-    Label schoolLabel;
+    Label itemName;
+
+    IMGUIContainer schemaImg;
 
     private UIInfoPanel infoPanel;
     private Spells spells;
 
+    private int [] spellsIDList = new int [7];
+    private int [] callsIDList = new int [7];
+
+    private bool isSpellPanelIsOpened;
 
     private void Start()
     {
@@ -57,22 +70,27 @@ public class UISpellsManager : MonoBehaviour
 
     private void Init()
     {
+        uIManager = GetComponent<UIManager> ();
         infoPanel = GetComponent<UIInfoPanel> ();
-        
+
 
         spellsContainer = root.Query<VisualElement> ("spells-container");
         spellContainer = root.Query<VisualElement> ("spell-container");
         infoContainer = root.Query<VisualElement> ("info-container");
+        magicPanel = root.Query<VisualElement> ("magic-panel");
+
         info = root.Query<Button> ("info-button");
         elem = root.Query<Button> ("elem-button");
         nature = root.Query<Button> ("nature-button");
         demonology = root.Query<Button> ("demon-button");
         necromancy = root.Query<Button> ("necro-button");
         defence = root.Query<Button> ("defence-button");
+        closePanelButton = root.Query<Button> ("close-panel-button");
 
         tabs = new Button [] { info, elem, nature, demonology, necromancy, defence };
 
-        schoolLabel = root.Query<Label> ("spells-pane-tab-name");
+        itemName = root.Query<Label> ("spells-panel-tab-name");
+
 
         spell1 = root.Query<Button> ("spell-level1-but");
         spell2 = root.Query<Button> ("spell-level2-but");
@@ -92,16 +110,73 @@ public class UISpellsManager : MonoBehaviour
         call7 = root.Query<Button> ("call-level7-but");
         callsButtons = new Button [] { call1, call2, call3, call4, call5, call6, call7 };
 
-        
-        info.clicked +=         delegate { TurnTab (0); };
-        elem.clicked +=         delegate { TurnTab (1); };
-        nature.clicked +=       delegate { TurnTab (2); };
-        demonology.clicked +=   delegate { TurnTab (3); };
-        necromancy.clicked +=   delegate { TurnTab (4); };
-        defence.clicked +=      delegate { TurnTab (5); };
-       
+        schemaImg = root.Query<IMGUIContainer> ("spell-schema-img");
 
-    }    
+        InitSpellButtons ();
+
+        closePanelButton.clicked += CloseOrReturn;
+
+        info.clicked += delegate { TurnTab (0); };
+        elem.clicked += delegate { TurnTab (1); };
+        nature.clicked += delegate { TurnTab (2); };
+        demonology.clicked += delegate { TurnTab (3); };
+        necromancy.clicked += delegate { TurnTab (4); };
+        defence.clicked += delegate { TurnTab (5); };
+
+
+    }
+
+    private void InitSpellButtons()
+    {
+        spellsButtons [0].clicked += delegate { OpenSpellPanel (true, 0); };
+        spellsButtons [1].clicked += delegate { OpenSpellPanel (true, 1); };
+        spellsButtons [2].clicked += delegate { OpenSpellPanel (true, 2); };
+        spellsButtons [3].clicked += delegate { OpenSpellPanel (true, 3); };
+        spellsButtons [4].clicked += delegate { OpenSpellPanel (true, 4); };
+        spellsButtons [5].clicked += delegate { OpenSpellPanel (true, 5); };
+        spellsButtons [6].clicked += delegate { OpenSpellPanel (true, 6); };
+
+        callsButtons [0].clicked += delegate { OpenSpellPanel (false, 0); };
+        callsButtons [1].clicked += delegate { OpenSpellPanel (false, 1); };
+        callsButtons [2].clicked += delegate { OpenSpellPanel (false, 2); };
+        callsButtons [3].clicked += delegate { OpenSpellPanel (false, 3); };
+        callsButtons [4].clicked += delegate { OpenSpellPanel (false, 4); };
+        callsButtons [5].clicked += delegate { OpenSpellPanel (false, 5); };
+        callsButtons [6].clicked += delegate { OpenSpellPanel (false, 6); };
+
+
+    }
+
+    private void OpenSpellPanel( bool isSpell, int spellNum )
+    {
+        SpellPanelOn ();
+        Spell spell;
+        if ( isSpell )
+            spell = spells.GetSpellByID (spellsIDList [spellNum]);
+        else
+            spell = spells.GetSpellByID (callsIDList [spellNum]);
+       
+        itemName.text = Localization.GetString(spell.spellTag);
+        schemaImg.style.backgroundImage = GameAssets.instance.GetSchemaByID (spell.spellID);
+    }
+
+    private void SpellPanelOn()
+    {
+        spellContainer.style.display = DisplayStyle.Flex;
+        spellsContainer.style.display = DisplayStyle.None;
+        infoContainer.style.display = DisplayStyle.None;
+        isSpellPanelIsOpened = true;
+        
+    }
+
+    private void SetButtonImages()
+    {
+        for ( int i = 0; i < spellsButtons.Length; i++ )
+        {
+            spellsButtons [i].style.backgroundImage = GameAssets.instance.GetActiveIconByID (spellsIDList [i]);
+            callsButtons [i].style.backgroundImage = GameAssets.instance.GetActiveIconByID (callsIDList [i]);
+        }
+    }
 
     private void InfoPanelOn()
     {
@@ -116,6 +191,21 @@ public class UISpellsManager : MonoBehaviour
         spellContainer.style.display = DisplayStyle.None;
         infoContainer.style.display = DisplayStyle.None;
         spellsContainer.style.display = DisplayStyle.Flex;
+        isSpellPanelIsOpened = false;
+        UpdateSpellBoard ();
+        SetButtonImages ();
+    }
+
+    private void CloseOrReturn()
+    {
+        if ( isSpellPanelIsOpened )
+        {
+            SpellsPanelOn ();
+        }
+        else
+        {
+            uIManager.ToggleSchoolList ();
+        }
     }
 
     public void UpdateSpellAndCallSchoolBoard( int [] spellList, int [] callList )
@@ -140,49 +230,49 @@ public class UISpellsManager : MonoBehaviour
             {
                 callsButtons [i].style.backgroundColor = Color.black;
             }
-
         }
+
+        
     }
 
     public void UpdateSpellBoard()
     {
-        int [] spList = new int [7];
-        int [] caList = new int [7];
         switch ( tabSelector )
         {
             case 0:
-                schoolLabel.text = Localization.GetString ("info");
+                itemName.text = Localization.GetString ("info");
                 break;
             case 1:
-                spList = spells.GetElementalListByIndex(0);
-                caList = spells.GetElementalListByIndex (1);
-                schoolLabel.text = Localization.GetString ("elemental");
+                spellsIDList = spells.GetElementalListByIndex (0);
+                callsIDList = spells.GetElementalListByIndex (1);
+                itemName.text = Localization.GetString ("elemental");
                 break;
             case 2:
-                spList = spells.GetNatureListByIndex(0);
-                caList = spells.GetNatureListByIndex (1);
-                schoolLabel.text = Localization.GetString ("nature"); 
+                spellsIDList = spells.GetNatureListByIndex (0);
+                callsIDList = spells.GetNatureListByIndex (1);
+                itemName.text = Localization.GetString ("nature");
                 break;
             case 3:
-                spList = spells.GetDemonologyListByIndex (0);
-                caList = spells.GetDemonologyListByIndex (1);
-                schoolLabel.text = Localization.GetString ("demonology"); 
+                spellsIDList = spells.GetDemonologyListByIndex (0);
+                callsIDList = spells.GetDemonologyListByIndex (1);
+                itemName.text = Localization.GetString ("demonology");
                 break;
             case 4:
-                spList = spells.GetNecromancyListByIndex (0);
-                caList = spells.GetNecromancyListByIndex (1);
-                schoolLabel.text = Localization.GetString ("necromancy");
+                spellsIDList = spells.GetNecromancyListByIndex (0);
+                callsIDList = spells.GetNecromancyListByIndex (1);
+                itemName.text = Localization.GetString ("necromancy");
                 break;
             case 5:
-                spList = spells.GetDefenciveListByIndex (0);
-                caList = spells.GetDefenciveListByIndex (1);
-                schoolLabel.text = Localization.GetString ("defencive");
+                spellsIDList = spells.GetDefenciveListByIndex (0);
+                callsIDList = spells.GetDefenciveListByIndex (1);
+                itemName.text = Localization.GetString ("defencive");
                 break;
             default:
                 break;
         }
 
-        UpdateSpellAndCallSchoolBoard (spList, caList);
+        SetButtonImages ();
+       // UpdateSpellAndCallSchoolBoard (spellsIDList, callsIDList);
     }
 
 
@@ -197,5 +287,15 @@ public class UISpellsManager : MonoBehaviour
         tabSelector = selector;
         tabs [tabSelector].style.backgroundColor = Color.green;
         UpdateSpellBoard ();
+    }
+
+    public void HideMagicPanel()
+    {
+        magicPanel.style.display = DisplayStyle.None;
+    }
+
+    public void ShowMagicPanel()
+    {
+        magicPanel.style.display = DisplayStyle.Flex;
     }
 }
