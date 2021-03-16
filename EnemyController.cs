@@ -86,7 +86,7 @@ public class EnemyController : MonoBehaviour
     public Tower GetTargetTower( Creep creep )
     {
         List<Tower> twrs = lines [creep.GetLinePosition ()].lineTowers;
-        Tower target = sortedTowers[creep.GetLinePosition ()];
+        Tower target = GetMainTargetTower (creep);
         float temp = float.MaxValue;
         for ( int i = 0; i < twrs.Count; i++ )
         {
@@ -96,9 +96,16 @@ public class EnemyController : MonoBehaviour
                 target = twrs [i];
                 temp = dist;
             }
-        }
+        }        
         return target;
     }
+
+    public Tower GetMainTargetTower( Creep creep )
+    {        
+        return sortedTowers [creep.GetLinePosition ()];
+    }
+
+
 
     public Creep GetClosestCreep( Tower tower )
     {

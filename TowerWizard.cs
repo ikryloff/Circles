@@ -38,7 +38,7 @@ public class TowerWizard : Tower
             BulletFly (GetEmptyTarget (LinePosition), bullet);
             return;
         }
-        if ( !targetEnemy.isDead )
+        if ( !targetEnemy.IsDead() )
         {
             BulletHit (targetEnemy, _damage, bullet);
         }

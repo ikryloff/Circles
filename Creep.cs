@@ -1,30 +1,30 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using UnityEngine;
 
 public class Creep : MonoBehaviour, IDamageable
 {
     EnemyController ec;
     private CreepAnimation creepAnimation;
+    [SerializeField]
+    private string enemyType;
 
-    public float xp;
-    public float speed;
-    public bool IsRanger;
-    public string Type;
-    public bool isDead;
-    public bool isInFight;
-    public float hitPoints;
-    public float startHp;
-    public float hp_norm;
-    public float attackRange;
+    private float xp;
+    private float speed;
+    private bool isRanger;
+    private bool isDead;
+    private bool isInFight;
+    private float hitPoints;
+    private float startHp;
+    private float hp_norm;
+    private float attackRange;
     private int linePosition;
-    public float fireDelay;
-    public float seekRate = 2f;
-    public float fireCountDown = 2f;
-    public float seekCountDown = 0f;
-    public int damage;
-    public string bulletName;
+    private float fireDelay;
+    private float fireCountDown;
+    private float damage;
+    private string bulletName;
+
+
+
     public GameObject bulletPref;
     public GameObject impactPref;
     public GameObject deathPref;
@@ -33,10 +33,12 @@ public class Creep : MonoBehaviour, IDamageable
 
     public Transform creepTransform;
     public Tower targetTower;
+    public Tower mainTargetTower;
     public HealthBar healthBar;
     private GameObject healthBarGO;
     private XPpoints xpPoints;
 
+    //private float time;
 
     private void Awake()
     {
@@ -44,6 +46,7 @@ public class Creep : MonoBehaviour, IDamageable
         healthBarGO = healthBar.gameObject;
         creepTransform = gameObject.transform;
         sprite = GetComponent<SpriteRenderer> ();
+        SetCreepProperties ();
     }
 
     private void Start()
@@ -58,21 +61,42 @@ public class Creep : MonoBehaviour, IDamageable
         healthBarGO.SetActive (false);
         RandZPosition (); // to prevent flicking
         ec.AddCreepToEnemyList (this);
+        GetMainTower ();
         GetClosestTower ();
+        //time = Time.time;
     }
 
     void Update()
     {
-
         if ( isDead )
-            return;        
+            return;
         CheckCollision ();
         if ( !isInFight )
         {
             creepTransform.Translate (Vector2.left * speed * Time.deltaTime);
-            
-        }        
-    }    
+        }
+    }
+
+    private void SetCreepProperties()
+    {
+        xp = EnemyProperties.GetXP (enemyType);
+        speed = EnemyProperties.GetSpeed (enemyType);
+        hitPoints = EnemyProperties.GetHP (enemyType);
+        attackRange = EnemyProperties.GetAttackRange (enemyType);
+        fireDelay = EnemyProperties.GetFireDelay (enemyType);
+        damage = EnemyProperties.GetDamage (enemyType);
+        isRanger = EnemyProperties.IsRanger (enemyType);
+        if ( isRanger )
+        {
+            bulletName = EnemyProperties.GetBulletName (enemyType);
+        }
+
+    }
+
+    public bool IsDead()
+    {
+        return isDead;
+    }
 
     private void RandZPosition()
     {
@@ -89,6 +113,8 @@ public class Creep : MonoBehaviour, IDamageable
         sprite.sortingOrder = linePosition;
         creepTransform.position = new Vector3 (creepTransform.position.x, creepTransform.position.y + Constants.CELL_HEIGHT, creepTransform.position.z);
         ec.AddCreepToEnemyList (this);
+        GetMainTower ();
+
     }
 
     public void MoveDown()
@@ -98,6 +124,7 @@ public class Creep : MonoBehaviour, IDamageable
         sprite.sortingOrder = linePosition;
         creepTransform.position = new Vector3 (creepTransform.position.x, creepTransform.position.y - Constants.CELL_HEIGHT, creepTransform.position.z);
         ec.AddCreepToEnemyList (this);
+        GetMainTower ();
     }
 
     private void CheckHP()
@@ -112,7 +139,7 @@ public class Creep : MonoBehaviour, IDamageable
             ec.RemoveCreepFromEnemyList (this);
             ec.creeps.Remove (this);
             xpPoints.AddPoints (xp, transform.position.x);
-            MakeDeath ();        
+            MakeDeath ();
         }
     }
 
@@ -126,14 +153,14 @@ public class Creep : MonoBehaviour, IDamageable
         linePosition = _line;
     }
 
-    public void CalcDamage( float damage)
+    public void CalcDamage( float damage )
     {
         if ( !healthBarGO.activeSelf )
             healthBarGO.SetActive (true);
         hitPoints -= damage;
         hp_norm = hitPoints / startHp;
         healthBar.SetHBSize (hp_norm);
-        MakeImpact ();        
+        MakeImpact ();
         creepAnimation.HitAnimation ();
         CheckHP ();
     }
@@ -145,9 +172,16 @@ public class Creep : MonoBehaviour, IDamageable
 
     private void MakeDeath()
     {
-        
+
         Instantiate (deathPref, creepTransform.position, Quaternion.identity);
         Destroy (gameObject);
+    }
+
+    public void GetMainTower()
+    {
+        mainTargetTower = ec.GetMainTargetTower (this);
+        targetTower = mainTargetTower;
+        print ("Update Main Tower");
     }
 
     public void GetClosestTower()
@@ -156,7 +190,7 @@ public class Creep : MonoBehaviour, IDamageable
         print ("Update Tower");
     }
 
-    public void GetClosestTowerAfterHit(Tower tower)
+    public void GetClosestTowerAfterHit( Tower tower )
     {
         if ( tower == targetTower )
             return;
@@ -166,17 +200,32 @@ public class Creep : MonoBehaviour, IDamageable
 
     public void CheckCollision()
     {
+        // stops fight anim
         if ( !isInFight && creepAnimation.IsFightAnimationIsOn () )
             creepAnimation.StopFightAnimation ();
 
         float dist = Vector2.Distance (targetTower.towerTransform.position, creepTransform.position);
+
+        if ( targetTower != mainTargetTower &&
+            targetTower.towerTransform.position.x > creepTransform.position.x &&
+            dist > Constants.CELL_WIDTH * attackRange )
+        {
+            targetTower = mainTargetTower;
+            print ("Change Tower");
+        }
+
         if ( dist < Constants.CELL_WIDTH * attackRange )
         {
+            // test
+            // time = Time.time - time;
+            // print ("time of " + enemyType + " " + time);
+            // MakeDeath ();
+            // test
             if ( !isInFight )
             {
                 isInFight = true;
                 creepAnimation.FaceToAnimation (targetTower);
-            }   
+            }
             AttackSerias ();
         }
         else
@@ -197,9 +246,9 @@ public class Creep : MonoBehaviour, IDamageable
         }
         fireCountDown -= Time.deltaTime;
     }
-   
 
-    private void Attack( int damage )
+
+    private void Attack( float damage )
     {
         if ( targetTower == null )
         {
@@ -211,9 +260,9 @@ public class Creep : MonoBehaviour, IDamageable
         StartCoroutine (FireAfterAnimation (damage));
     }
 
-    public void Fire( float damage)
+    public void Fire( float damage )
     {
-        if ( IsRanger )
+        if ( isRanger )
         {
             GameObject bulletGO = Instantiate (bulletPref, creepTransform.position, Quaternion.identity) as GameObject;
             Bullet bullet = bulletGO.GetComponent<Bullet> ();
@@ -237,9 +286,9 @@ public class Creep : MonoBehaviour, IDamageable
 
     private void SetBullet()
     {
-        if(bulletName != "")
+        if ( bulletName != null )
             bulletPref = GameAssets.instance.GetAssetByString (bulletName);
         impactPref = GameAssets.instance.GetAssetByString (Constants.BLOOD_IMPACT);
         deathPref = GameAssets.instance.GetAssetByString (Constants.CREEP_DEATH);
-    }       
+    }
 }

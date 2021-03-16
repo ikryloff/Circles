@@ -131,16 +131,21 @@ public class TowerAI : Tower
                 enemy = targetCreep;
             }
 
-            if ( !enemy.isDead )
+            if ( !enemy.IsDead() )
             {
-                towerAnimation.AttackAnimation (enemy);
-                StartCoroutine (FireAfterAnimation (enemy, damage));
+                float dist = Vector2.Distance (transform.position, enemy.creepTransform.position);
+                if ( dist <= range * Constants.CELL_WIDTH )
+                {
+                    towerAnimation.AttackAnimation (enemy);
+                    StartCoroutine (FireAfterAnimation (enemy, damage));
+                }
+                  
             }
         }
         else
         {
             Creep creep = targetCreep;
-            if ( !creep.isDead )
+            if ( !creep.IsDead () )
             {
                 towerAnimation.AttackAnimation (creep);
                 StartCoroutine (FireAfterAnimation (creep, damage));
