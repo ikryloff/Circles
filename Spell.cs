@@ -14,12 +14,14 @@ public class Spell : ScriptableObject
     public bool isBarrier;
     public bool isTrap;
     public bool isTowerActive;
+    public bool isEnemyAffect;
     public string school;
     public string target;
     public string code;
     public string bullet;
     public int damage;
     public int cost;
+    public float prepareTime;
     public int targetRow; // 8 - all, 1 - top, 2 - bottom, 3 - center, 4 - all inside, 0 - tower
     public int [] targetCell;
 

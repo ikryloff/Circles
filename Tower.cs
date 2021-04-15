@@ -16,6 +16,7 @@ public class Tower : MonoBehaviour, IDamageable
     public int LinePosition;
     public int CellPosition;
     public float hp_norm;
+    public float startHp;
     public bool isAI;
     private Cell cell;
 
@@ -25,9 +26,12 @@ public class Tower : MonoBehaviour, IDamageable
     public List<Creep> creepsInLine;
     public List<Creep> creeps;
 
+    public ParticleSystem fog;
+
     protected void Awake()
     {
         towerTransform = transform;
+        fog = transform.GetComponentInChildren<ParticleSystem> ();
     }
 
     public virtual void Start()
@@ -40,6 +44,10 @@ public class Tower : MonoBehaviour, IDamageable
     }
 
     public virtual void UpdateTarget()
+    {
+    }
+
+    public virtual void HealTower(float hp)
     {
     }
 
@@ -56,6 +64,10 @@ public class Tower : MonoBehaviour, IDamageable
     {
     }
 
+    public void PlayFog()
+    {
+        fog.Play ();
+    }
 
     public void AddTower()
     {

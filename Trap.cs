@@ -85,4 +85,5 @@ public class Trap : Tower
             impactPref = GameAssets.instance.GetAssetByString (impactName);
 
     }
+   
 }

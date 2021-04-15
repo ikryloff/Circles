@@ -22,6 +22,7 @@ public class ObjectsHolder : MonoBehaviour
 
 
 
+
     private void Awake()
     {
         if ( !Instance )

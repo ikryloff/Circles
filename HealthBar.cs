@@ -12,6 +12,7 @@ public class HealthBar : MonoBehaviour
     {
         bar = transform.Find ("Bar");
         sprite = bar.Find ("BarSprite").GetComponent<SpriteRenderer> ();
+        sprite.sortingOrder = 300;
     }
 
     public void SetHBSize( float size )

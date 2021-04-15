@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class TowerWizard : Tower
 {
@@ -23,7 +24,7 @@ public class TowerWizard : Tower
         {
             for ( int i = 0; i < creepsInLine.Count; i++ )
             {
-                if ( creepsInLine[i] != null )
+                if ( creepsInLine [i] != null )
                 {
                     BulletHit (creepsInLine [i], _damage, bullet);
                 }
@@ -38,11 +39,39 @@ public class TowerWizard : Tower
             BulletFly (GetEmptyTarget (LinePosition), bullet);
             return;
         }
-        if ( !targetEnemy.IsDead() )
+        if ( !targetEnemy.IsDead () )
         {
             BulletHit (targetEnemy, _damage, bullet);
         }
     }
+
+    public void SlowEnemyMoving( string school, string spellTarget )
+    {
+        if ( spellTarget == Constants.SPELL_TARGET_ALL )
+        {
+            for ( int i = 0; i < creepsInLine.Count; i++ )
+            {
+                if ( creepsInLine [i] != null )
+                {
+                    creepsInLine [i].SetSlowSpeed ();
+                    creepsInLine [i].PlayAffect ();
+                }
+            }
+            return;
+        }
+
+        targetEnemy = GetTarget (spellTarget);
+
+        if ( targetEnemy && !targetEnemy.IsDead () )
+        {
+            targetEnemy.SetSlowSpeed ();
+            targetEnemy.PlayAffect ();
+        }
+        else
+            print ("Wrong target!");
+    }
+
+
 
     private Creep GetTarget( string spellTarget )
     {
@@ -53,7 +82,7 @@ public class TowerWizard : Tower
         {
             int rand = Random.Range (0, creepsInLine.Count);
             target = creepsInLine [rand];
-        }        
+        }
         else
         {
             float temp = float.MaxValue;
@@ -98,4 +127,6 @@ public class TowerWizard : Tower
         creep.GetClosestTowerAfterHit (this);
 
     }
+
+   
 }

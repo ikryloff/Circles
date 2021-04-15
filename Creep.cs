@@ -12,6 +12,7 @@ public class Creep : MonoBehaviour, IDamageable
     private float speed;
     private bool isRanger;
     private bool isDead;
+    private bool isSlow;
     private bool isInFight;
     private float hitPoints;
     private float startHp;
@@ -37,11 +38,14 @@ public class Creep : MonoBehaviour, IDamageable
     public HealthBar healthBar;
     private GameObject healthBarGO;
     private XPpoints xpPoints;
+    [SerializeField]
+    private ParticleSystem suppressionWind, defenceAffect;
 
     //private float time;
 
     private void Awake()
     {
+        suppressionWind.Stop ();
         creepAnimation = GetComponent<CreepAnimation> ();
         healthBarGO = healthBar.gameObject;
         creepTransform = gameObject.transform;
@@ -59,7 +63,7 @@ public class Creep : MonoBehaviour, IDamageable
         ec = oh.enemyController;
         SetBullet ();
         healthBarGO.SetActive (false);
-        RandZPosition (); // to prevent flicking
+        DisplaceZPosition (); // to prevent flicking
         ec.AddCreepToEnemyList (this);
         GetMainTower ();
         GetClosestTower ();
@@ -90,7 +94,15 @@ public class Creep : MonoBehaviour, IDamageable
         {
             bulletName = EnemyProperties.GetBulletName (enemyType);
         }
+    }
 
+    public void SetSlowSpeed()
+    {
+        if ( !isSlow )
+        {
+            speed = speed / 2;
+            isSlow = true;
+        }
     }
 
     public bool IsDead()
@@ -98,12 +110,18 @@ public class Creep : MonoBehaviour, IDamageable
         return isDead;
     }
 
-    private void RandZPosition()
+    private void DisplaceZPosition()
     {
-        float rand = UnityEngine.Random.Range (.0001f, .9999f);
+        float dp = EnemyController.GetDisplace ();
         sprite.sortingOrder = linePosition;
-        creepTransform.position = new Vector3 (creepTransform.position.x, creepTransform.position.y, creepTransform.position.z + rand);
+        creepTransform.position = new Vector3 (creepTransform.position.x, creepTransform.position.y, creepTransform.position.z + dp);
 
+    }
+
+    public void PlayAffect()
+    {
+        suppressionWind.Play ();
+        defenceAffect.Play ();
     }
 
     public void MoveUp()
@@ -262,20 +280,23 @@ public class Creep : MonoBehaviour, IDamageable
 
     public void Fire( float damage )
     {
-        if ( isRanger )
+        if ( targetTower )
         {
-            GameObject bulletGO = Instantiate (bulletPref, creepTransform.position, Quaternion.identity) as GameObject;
-            Bullet bullet = bulletGO.GetComponent<Bullet> ();
-            if ( bullet != null )
+            if ( isRanger )
             {
-                bullet.SeekTower (targetTower, damage);
+                GameObject bulletGO = Instantiate (bulletPref, creepTransform.position, Quaternion.identity) as GameObject;
+                Bullet bullet = bulletGO.GetComponent<Bullet> ();
+                if ( bullet != null )
+                {
+                    bullet.SeekTower (targetTower, damage);
+                }
             }
+            else
+            {
+                targetTower.CalcDamage (damage);
+            }
+            targetTower.UpdateTargetAfterHit (this);
         }
-        else
-        {
-            targetTower.CalcDamage (damage);
-        }
-        targetTower.UpdateTargetAfterHit (this);
     }
 
     private IEnumerator FireAfterAnimation( float damage )

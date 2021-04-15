@@ -10,6 +10,8 @@ public class Constants
     public static float TRAP_DIST = 0.3f;
     public static float PATH_LENGHT = 17f;
     public static float PATH_START_X = 10.4f;
+
+    public static float TOWER_HEAL_POINTS = 30f;
     //Strings
     public static string ANIM_ENEMY_HIT_FORWARD = "enemy_hit_forward";
     public static string ANIM_ENEMY_HIT_BACK = "enemy_hit_back";
@@ -47,7 +49,9 @@ public class Constants
     public static string TOWER_CODE_SHIELD = "1212";
     public static string TOWER_CODE_GO_AWAY = "110211020012";
     public static string TOWER_CODE_COME_HERE = "010211020112";
-    public static string SPELL_CODE_VICTIMS_RETURN = "110210120112";
+    public static string SPELL_CODE_SACRIFICE = "110210120112";
+    public static string SPELL_CODE_ENCOURAGEMENT = "110210020112";
+    public static string SPELL_CODE_SUPPRESSION = "102112012";
 
     //Schools
     public static string NATURE = "NATURE MAGIC";

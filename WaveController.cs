@@ -4,18 +4,27 @@ using UnityEngine;
 public class WaveController : MonoBehaviour
 {
     private EnemyController ec;
-    public Wave [] waves;
+    private Wave [] waves;
+    public WavesList wavesList;
     public Transform [] spawnPoints;
 
-    public float timeBetweenWaves;
+    private float timeBetweenWaves = 40f;
+    private float timeBetweenCreeps = 10f;
     private float countdown = 2f;
 
     private int waveIndex = 0;
 
+    private void Awake()
+    {
+        wavesList = GetComponent<WavesList>();
+        waves = new Wave [3];
+    }
     private void Start()
     {
+       
         ec = ObjectsHolder.Instance.enemyController;
         spawnPoints = ec.spawns;
+        waves = wavesList.GetWavesList (PlayerStats.GetPlayerLevel());
     }
 
     private void Update()
@@ -42,7 +51,7 @@ public class WaveController : MonoBehaviour
         {
             SpawnEnemy (wave.creeps [i]);
             countdown = timeBetweenWaves;
-            yield return new WaitForSeconds (wave.timeBetweenCreeps);
+            yield return new WaitForSeconds (timeBetweenCreeps);
         }
         waveIndex++;
 

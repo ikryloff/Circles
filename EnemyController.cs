@@ -10,6 +10,8 @@ public class EnemyController : MonoBehaviour
     public TowerWizard [] towerWizards;
     public Tower [] sortedTowers;
 
+    public static float displace = 0f;
+
     private void Awake()
     {
         lines = FindObjectsOfType<Line> ();
@@ -122,5 +124,13 @@ public class EnemyController : MonoBehaviour
             }
         }
         return target;
+    }
+
+    public static float GetDisplace()
+    {
+        if ( displace > 0.9999f )
+            displace = 0.0001f;
+        displace += 0.0001f;
+        return displace;
     }
 }

@@ -32,9 +32,9 @@ public class BuildingManager : MonoBehaviour
             PrintMessage ("You have no mana!");
             return;
         }
-
+        float dp = EnemyController.GetDisplace ();
         GameObject prefab = GameAssets.instance.GetAssetByString (spell.spellTag);
-        GameObject newTower = Instantiate (prefab, new Vector3 (cellPos.x, cellPos.y + 0.3f, prefab.transform.position.z), Quaternion.identity) as GameObject;
+        GameObject newTower = Instantiate (prefab, new Vector3 (cellPos.x, cellPos.y + 0.3f, prefab.transform.position.z + dp), Quaternion.identity) as GameObject;
         TowerAI tower = newTower.GetComponent<TowerAI> ();
         tower.LinePosition = cellLine;
         tower.CellPosition = cellNum;
@@ -97,9 +97,9 @@ public class BuildingManager : MonoBehaviour
             PrintMessage ("You have no mana!");
             return;
         }
-
+        float dp = EnemyController.GetDisplace ();
         GameObject prefab = GameAssets.instance.GetAssetByString (spell.spellTag);
-        GameObject newTower = Instantiate (prefab, new Vector3 (cellPos.x, cellPos.y + 0.3f, prefab.transform.position.z), Quaternion.identity) as GameObject;
+        GameObject newTower = Instantiate (prefab, new Vector3 (cellPos.x, cellPos.y + 0.3f, prefab.transform.position.z + dp), Quaternion.identity) as GameObject;
         Trap tower = newTower.GetComponent<Trap> ();
         tower.LinePosition = cellLine;
         tower.CellPosition = cellNum;
@@ -129,8 +129,9 @@ public class BuildingManager : MonoBehaviour
     private void PlaceBuilding( Spell spell, Cell cell, int quantity )
     {
         Vector2 cellPos = cell.transform.position;
+        float dp = EnemyController.GetDisplace ();
         GameObject prefab = GameAssets.instance.GetAssetByString (spell.spellTag);
-        GameObject newTower = Instantiate (prefab, new Vector3 (cellPos.x, cellPos.y + 0.3f, prefab.transform.position.z), Quaternion.identity) as GameObject;
+        GameObject newTower = Instantiate (prefab, new Vector3 (cellPos.x, cellPos.y + 0.3f, prefab.transform.position.z + dp), Quaternion.identity) as GameObject;
         TowerBarrier tower = newTower.GetComponent<TowerBarrier> ();
         tower.LinePosition = cell.LineNumber;
         tower.CellPosition = cell.CellNumber;

@@ -122,16 +122,26 @@ public class Spells : MonoBehaviour
 
     private void ExecuteTowerSpell( Spell spell, int top, int bottom, int left, int right )
     {
-        if ( spell.code.Equals (Constants.SPELL_CODE_VICTIMS_RETURN) )
+        if ( spell.code.Equals (Constants.SPELL_CODE_SACRIFICE) )
         {
             attackManager.ReturnMana (spell, new int [] { top + spell.targetCell [0], left + spell.targetCell [1] });
+        }
+        else if ( spell.code.Equals (Constants.SPELL_CODE_ENCOURAGEMENT) )
+        {
+            attackManager.HealTower (spell, new int [] { top + spell.targetCell [0], left + spell.targetCell [1] });
         }
     }
 
     private void ExecuteActiveSpell( Spell spell, int top, int bottom, int left, int right )
     {
         int [] arr = spell.CalcTarget (top, bottom, left, right);
-        attackManager.AttackEnemies (spell, arr);
+        if ( spell.isEnemyAffect )
+        {
+            if ( spell.code.Equals (Constants.SPELL_CODE_SUPPRESSION) )
+                attackManager.SlowEnemieMoving (spell, arr);
+        }
+        else
+            attackManager.AttackEnemies (spell, arr);
     }
 
     private void ExecuteMultipleSpell( Spell spell, List<Cell> cells )

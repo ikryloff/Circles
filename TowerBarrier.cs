@@ -4,7 +4,6 @@ public class TowerBarrier : Tower
 {
 
     private HealthBar healthBar;
-    public float startHp;
     private SpriteRenderer sprite;
     private TowerAnimation towerAnimation;
     private GameObject healthBarGO;
@@ -61,6 +60,21 @@ public class TowerBarrier : Tower
         towerAnimation.HitAnimation ();
         MakeImpact ();
         CheckTower ();
+    }
+
+    public override void HealTower( float hp )
+    {
+        if ( !healthBarGO.activeSelf )
+            healthBarGO.SetActive (true);
+        hitPoints += hp;
+        if ( hitPoints >= startHp )
+        {
+            hitPoints = startHp;
+            healthBarGO.SetActive (false);
+        }
+        hp_norm = hitPoints / startHp;
+        healthBar.SetHBSize (hp_norm);
+        PlayFog ();
     }
 
     private void MakeImpact()

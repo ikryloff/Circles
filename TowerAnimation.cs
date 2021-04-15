@@ -43,7 +43,9 @@ public class TowerAnimation : MonoBehaviour
 
     private bool IsTargetFoward( Transform creep )
     {
-        return creep.position.x - tower.towerTransform.position.x <= 0;
+        if ( creep && tower )
+            return creep.position.x - tower.towerTransform.position.x <= 0;
+        else return false;
       
     }
 

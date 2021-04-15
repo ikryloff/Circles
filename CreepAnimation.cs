@@ -14,7 +14,7 @@ public class CreepAnimation : MonoBehaviour
     }    
 
     public void HitAnimation()
-    {
+    {        
         if ( isBackDirection )
             animator.Play (Constants.ANIM_ENEMY_HIT_BACK);
         else
@@ -70,7 +70,9 @@ public class CreepAnimation : MonoBehaviour
 
     private bool IsTargetFoward( Transform tower )
     {
-        return creep.creepTransform.position.x - tower.position.x >= 0;
+        if ( tower && creep )
+            return creep.creepTransform.position.x - tower.position.x >= 0;
+        else return false;
     }
 
 

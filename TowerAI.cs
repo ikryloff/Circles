@@ -4,7 +4,7 @@ using UnityEngine;
 public class TowerAI : Tower
 {
     public HealthBar healthBar;
-    public float startHp;
+
     private SpriteRenderer sprite;
     private TowerAnimation towerAnimation;
     public bool IsRanger;
@@ -45,6 +45,7 @@ public class TowerAI : Tower
     {
         CheckCollision ();
     }
+      
 
     private void CheckCollision()
     {
@@ -120,32 +121,23 @@ public class TowerAI : Tower
             return;
         if ( IsRanger )
         {
-            Creep enemy = null;
-            int rand = Random.Range (0, creepsInLine.Count);
-            if ( attackType.Equals (Constants.SPELL_TARGET_RANDOM_IN_LINE) )
+            Creep creep = creep = targetCreep;
+           
+            if ( creep != null )
             {
-                enemy = creepsInLine [rand];
-            }
-            else if ( attackType.Equals (Constants.SPELL_TARGET_NEAREST_IN_LINE) )
-            {
-                enemy = targetCreep;
-            }
-
-            if ( !enemy.IsDead() )
-            {
-                float dist = Vector2.Distance (transform.position, enemy.creepTransform.position);
+                float dist = Vector2.Distance (transform.position, creep.creepTransform.position);
                 if ( dist <= range * Constants.CELL_WIDTH )
                 {
-                    towerAnimation.AttackAnimation (enemy);
-                    StartCoroutine (FireAfterAnimation (enemy, damage));
+                    towerAnimation.AttackAnimation (creep);
+                    StartCoroutine (FireAfterAnimation (creep, damage));
                 }
-                  
+
             }
         }
         else
         {
             Creep creep = targetCreep;
-            if ( !creep.IsDead () )
+            if ( creep != null )
             {
                 towerAnimation.AttackAnimation (creep);
                 StartCoroutine (FireAfterAnimation (creep, damage));
@@ -157,20 +149,23 @@ public class TowerAI : Tower
 
     public void Fire( Creep creep, float damage )
     {
-        if ( IsRanger )
+        if ( creep )
         {
-            GameObject bulletGO = Instantiate (bulletPref, firePoint.position, Quaternion.identity) as GameObject;
-            Bullet bullet = bulletGO.GetComponent<Bullet> ();
-            if ( bullet != null )
+            if ( IsRanger )
             {
-                bullet.SeekEnemy (creep, damage);
+                GameObject bulletGO = Instantiate (bulletPref, firePoint.position, Quaternion.identity) as GameObject;
+                Bullet bullet = bulletGO.GetComponent<Bullet> ();
+                if ( bullet != null )
+                {
+                    bullet.SeekEnemy (creep, damage);
+                }
             }
+            else
+            {
+                creep.CalcDamage (damage);
+            }
+            creep.GetClosestTowerAfterHit (this);
         }
-        else
-        {
-            creep.CalcDamage (damage);
-        }
-        creep.GetClosestTowerAfterHit (this);
     }
 
     public override void CalcDamage( float damage )
@@ -183,6 +178,21 @@ public class TowerAI : Tower
         towerAnimation.HitAnimation (targetCreep.creepTransform);
         MakeImpact ();
         CheckTower ();
+    }
+
+    public override void HealTower( float hp )
+    {
+        if ( !healthBarGO.activeSelf )
+            healthBarGO.SetActive (true);
+        hitPoints += hp;
+        if ( hitPoints >= startHp )
+        {
+            hitPoints = startHp;
+            healthBarGO.SetActive (false);
+        }
+        hp_norm = hitPoints / startHp;
+        healthBar.SetHBSize (hp_norm);
+        PlayFog ();
     }
 
     private IEnumerator FireAfterAnimation( Creep enemy, float damage )
@@ -202,7 +212,7 @@ public class TowerAI : Tower
 
     }
 
-    public override void UpdateTargetAfterHit(Creep creep )
+    public override void UpdateTargetAfterHit( Creep creep )
     {
         if ( creep == targetCreep )
             return;

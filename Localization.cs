@@ -30,7 +30,7 @@ public class Localization
         { "rock_from_the_sky", new string[] { "ROCK FROM THE SKY", "йюлемэ я меаю"} },
         { "power_impulse", new string[] { "POWERFUL IMPULSE", "лнымши хлоскэя"} },
         { "thunder_sound", new string[] { "THUNDER SOUND", "пюяйюр цпнлю"} },
-        { "victims_return", new string[] { "VICTIMS RETURN", "бнгбпюр фепрбш"} },
+        { "sacrifice", new string[] { "SACRIFICE", "фепрбнопхмньемхе"} },
         { "ice_icicle", new string[] { "ICE ICICLE", "кедъмюъ яняскэйю"} },
         { "elemental_power", new string[] { "ELEMENTAL POWER", "яхкю ярхухх"} },
 
@@ -49,6 +49,10 @@ public class Localization
         { "wild_wolf", new string[] { "WILD WOLF", "дхйхи бнкй"} },
         { "wood_wall", new string[] { "WOOD WALL", "депебъммши гюанп"} },
         { "demons_trap", new string[] { "DEMONS TRAP", "делнмхвеяйюъ кнбсьйю"} },
+        { "pharaohs_mantrap", new string[] { "PHARAOHS MANTRAP", "йюойюм тюпюнмнб"} },
+        { "encouragement", new string[] { "ENCOURAGEMENT", "онныпемхе"} },
+        { "suppression", new string[] { "SUPPRESSION", "сялхпемхе"} },
+        { "deadmans_skull", new string[] { "DEADMANS SKULL", "вепео лепрбежю"} },
 
 
 
