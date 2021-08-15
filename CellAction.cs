@@ -10,7 +10,7 @@ public class CellAction : MonoBehaviour, IPointerEnterHandler
 
     public void OnPointerEnter( PointerEventData eventData )
     {
-        if ( !touchController.IsSkillBoardOpened () )
+        if ( !touchController.IsStopTouching () )
         {
             if ( !cell.IsLoaded )
             {

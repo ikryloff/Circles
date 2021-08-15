@@ -23,6 +23,7 @@ public class Trap : Tower
     {
         base.Start ();
         isAI = true;
+        IsTrap = true;
         AddTower (this);
         sprite.sortingOrder = LinePosition - 1;
         SetPrefs ();
@@ -62,9 +63,12 @@ public class Trap : Tower
             creep.MoveUp ();
         else if ( trapCode.Equals (Constants.TOWER_CODE_COME_HERE) )
             creep.MoveDown ();
+        else if ( trapCode.Equals (Constants.TOWER_CODE_MAGIC_LOOP) )
+            creep.MoveBack ();
         else
             creep.CalcDamage (damage);
         TowerDeath ();
+        GameEvents.current.EnemyAppear ();
     }
 
     public override void TowerDeath()

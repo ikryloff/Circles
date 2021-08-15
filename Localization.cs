@@ -47,12 +47,16 @@ public class Localization
         { "stone_wall", new string[] { "STONE WALL", "йюлеммюъ яремю"} },
         { "thunder_elemental", new string[] { "THUNDER ELEMENTAL", "щкелемрюкэ цпнлю"} },
         { "wild_wolf", new string[] { "WILD WOLF", "дхйхи бнкй"} },
+        { "wolf_pack", new string[] { "WOLF PACK", "ярюъ бнкйнб"} },
         { "wood_wall", new string[] { "WOOD WALL", "депебъммши гюанп"} },
         { "demons_trap", new string[] { "DEMONS TRAP", "делнмхвеяйюъ кнбсьйю"} },
         { "pharaohs_mantrap", new string[] { "PHARAOHS MANTRAP", "йюойюм тюпюнмнб"} },
         { "encouragement", new string[] { "ENCOURAGEMENT", "онныпемхе"} },
         { "suppression", new string[] { "SUPPRESSION", "сялхпемхе"} },
         { "deadmans_skull", new string[] { "DEADMANS SKULL", "вепео лепрбежю"} },
+        { "giant_spider", new string[] { "GIANT SPIDER", "цхцюмряйхи оюсй"} },
+        { "skeleton", new string[] { "SKELETON", "яйекер"} },
+
 
 
 

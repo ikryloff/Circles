@@ -5,6 +5,8 @@ public class ObjectsHolder : MonoBehaviour
 {
     public Sprite spellSprite;
     public Sprite cellSprite;
+    public Sprite colorSprite;
+    public Sprite untouchableSprite;
     public static ObjectsHolder Instance { get; private set; }
     public Physics2DRaycaster Raycaster;
     public Camera mainCamera;
@@ -19,6 +21,7 @@ public class ObjectsHolder : MonoBehaviour
     public UIManager uIManager;
     public TouchController touchController;
     public FirePoints firePoints;
+    public CastManager castManager;
 
 
 
@@ -28,7 +31,7 @@ public class ObjectsHolder : MonoBehaviour
         if ( !Instance )
         {
             Instance = this;
-            DontDestroyOnLoad (this);
+           // DontDestroyOnLoad (this);
         }
         else
             Destroy (this);
@@ -39,6 +42,7 @@ public class ObjectsHolder : MonoBehaviour
         field = FindObjectOfType<Field> ();
         buildingManager = FindObjectOfType<BuildingManager> ();
         attackManager = FindObjectOfType<AttackManager> ();
+        castManager = FindObjectOfType<CastManager> ();
         enemyController = FindObjectOfType<EnemyController> ();
         touchController = FindObjectOfType<TouchController>();
         wizard = FindObjectOfType<Wizard> ();

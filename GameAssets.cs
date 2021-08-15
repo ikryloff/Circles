@@ -12,7 +12,7 @@ public class GameAssets : MonoBehaviour
         if ( !instance )
         {
             instance = this;
-            DontDestroyOnLoad (this);
+           // DontDestroyOnLoad (this);
         }
         else
             Destroy (this);
@@ -28,7 +28,7 @@ public class GameAssets : MonoBehaviour
     public GameObject [] prefabs;
 
     [SerializeField]
-    private Texture2D [] activeIcons = new Texture2D[77];
+    private Texture2D [] activeIcons = new Texture2D [77];
     [SerializeField]
     private Texture2D [] unactiveIcons = new Texture2D [77];
     [SerializeField]
@@ -65,6 +65,11 @@ public class GameAssets : MonoBehaviour
             return schemas [id];
         else
             return testIcon;
+    }
+
+    public Texture2D GetEmptyIcon()
+    {
+        return testIcon;
     }
 
 }

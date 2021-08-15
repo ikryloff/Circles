@@ -13,6 +13,8 @@ public class Wizard : MonoBehaviour
     private float manaCicleRate;
     public float temp;
 
+    public static bool StopCasting;
+
     void Start()
     {
         uI = ObjectsHolder.Instance.uIManager;
@@ -81,6 +83,8 @@ public class Wizard : MonoBehaviour
     public void ManaWaste( float mPoints )
     {
         manaPoints -= mPoints;
+        if ( manaPoints < 0 )
+            manaPoints = 0;
         CalcMana ();
     }
 
@@ -102,7 +106,7 @@ public class Wizard : MonoBehaviour
     //For test
     public void PrintSpellsIDList()
     {
-        for ( int i = 0; i < PlayerStats.GetPlayerSpellsIDList().Length; i++ )
+        for ( int i = 0; i < PlayerStats.GetPlayerSpellsIDList ().Length; i++ )
         {
             print (PlayerStats.GetPlayerSpellsIDList () [i] + ", ");
         }

@@ -8,9 +8,10 @@ public class AttackManager : MonoBehaviour
     public TowerWizard [] rawTowers;
     public TowerWizard [] towers;
     private Wizard wizard;
+    private CastManager castManager;
     private UIManager ui;
     public Field field;
-    private bool isCasting;
+    private List<TowerWizard> attackTowers;
 
     private void Awake()
     {
@@ -22,8 +23,10 @@ public class AttackManager : MonoBehaviour
         field = ObjectsHolder.Instance.field;
         wizard = ObjectsHolder.Instance.wizard;
         towers = new TowerWizard [rawTowers.Length];
+        attackTowers = new List<TowerWizard> ();
         ui = ObjectsHolder.Instance.uIManager;
         ec = ObjectsHolder.Instance.enemyController;
+        castManager = ObjectsHolder.Instance.castManager;
         SortTowers ();
     }
 
@@ -37,33 +40,42 @@ public class AttackManager : MonoBehaviour
 
     public void AttackEnemies( Spell spell, int [] lines )
     {
-        if ( isCasting )
-            return;
         if ( spell.cost > wizard.GetManapoints () )
         {
             PrintMessage ("You have no mana!");
+            EndCasting ();
             return;
         }
+
         GameObject bulletPrefab = GetBulletPrefab (spell.bullet);
+        attackTowers.Clear ();
+
         for ( int i = 0; i < lines.Length; i++ )
         {
-            if ( lines [i] == 0 || lines [i] == 8 )
-                return;
-            if ( towers [lines [i] - 1] != null )
-                StartCoroutine(PrepareForAttack (spell, bulletPrefab, towers [lines [i] - 1]));               
+            if ( lines [i] != 0 && lines [i] != 8 )
+            {
+                attackTowers.Add (towers [lines [i] - 1]);
+            }
         }
 
+        if ( attackTowers.Count == 0 )
+        {
+            PrintMessage ("Can`t do that here!");
+            EndCasting ();
+            return;
+        }
+
+        StartCoroutine (PrepareSpell (Constants.ATTACK, spell, null, null, null, bulletPrefab, attackTowers));
         wizard.ManaWaste (spell.cost);
         PrintMessage (spell.spellName);
     }
 
     public void SlowEnemieMoving( Spell spell, int [] lines )
     {
-        if ( isCasting )
-            return;
         if ( spell.cost > wizard.GetManapoints () )
         {
             PrintMessage ("You have no mana!");
+            EndCasting (); ;
             return;
         }
         for ( int i = 0; i < lines.Length; i++ )
@@ -71,7 +83,7 @@ public class AttackManager : MonoBehaviour
             if ( lines [i] == 0 || lines [i] == 8 )
                 return;
             if ( towers [lines [i] - 1] != null )
-                 StartCoroutine (PrepareForSlow (spell, towers [lines [i] - 1]));
+                StartCoroutine (PrepareSpell (Constants.SLOW, spell, null, null, towers [lines [i] - 1], null, null));
         }
 
         wizard.ManaWaste (spell.cost);
@@ -80,8 +92,6 @@ public class AttackManager : MonoBehaviour
 
     public void ReturnMana( Spell spell, int [] cellCoord )
     {
-        if ( isCasting )
-            return;
         int cellLine = cellCoord [0];
         int cellNum = cellCoord [1];
         print (cellLine + " " + cellNum);
@@ -90,11 +100,13 @@ public class AttackManager : MonoBehaviour
         if ( !cell.IsEngaged )
         {
             PrintMessage ("Nothing to return!");
+            EndCasting ();
             return;
         }
         if ( spell.cost > wizard.GetManapoints () )
         {
             PrintMessage ("You have no mana!");
+            EndCasting ();
             return;
         }
 
@@ -104,24 +116,23 @@ public class AttackManager : MonoBehaviour
         {
             Tower towerTmp = lineTowers [i];
             if ( towerTmp != null )
-            {               
+            {
                 if ( towerTmp.GetCell () == field.GetCell (cellLine, cellNum) )
                 {
                     towerToDestroy = towerTmp;
                 }
             }
-            
+
         }
 
         if ( towerToDestroy )
         {
-            print (towerToDestroy.name);
-            StartCoroutine(PrepareForReturnMana (spell, towerToDestroy));
+            StartCoroutine (PrepareSpell (Constants.RETURN_TOWER, spell, towerToDestroy, null, null, null, null));
             wizard.ManaWaste (spell.cost);
             PrintMessage (spell.spellName);
             return;
-        }  
-        
+        }
+
         List<Trap> lineTraps = ec.lines [cellLine].lineTraps;
         Trap trapToDestroy = null;
         for ( int i = 0; i < lineTraps.Count; i++ )
@@ -138,20 +149,21 @@ public class AttackManager : MonoBehaviour
 
         if ( trapToDestroy )
         {
-            StartCoroutine(PrepareForReturnMana (spell, trapToDestroy));
+            StartCoroutine (PrepareSpell (Constants.RETURN_TRAP, spell, null, trapToDestroy, null, null, null));
             wizard.ManaWaste (spell.cost);
             PrintMessage (spell.spellName);
             return;
         }
-        
-        if(!trapToDestroy && !towerToDestroy )
+
+        if ( !trapToDestroy && !towerToDestroy )
+        {
             PrintMessage ("Bad attempt!");
+            EndCasting ();
+        }
     }
 
     public void HealTower( Spell spell, int [] cellCoord )
     {
-        if ( isCasting )
-            return;
         int cellLine = cellCoord [0];
         int cellNum = cellCoord [1];
         print (cellLine + " " + cellNum);
@@ -160,11 +172,13 @@ public class AttackManager : MonoBehaviour
         if ( !cell.IsEngaged )
         {
             PrintMessage ("Nothing to heal!");
+            EndCasting ();
             return;
         }
         if ( spell.cost > wizard.GetManapoints () )
         {
             PrintMessage ("You have no mana!");
+            EndCasting ();
             return;
         }
 
@@ -183,15 +197,18 @@ public class AttackManager : MonoBehaviour
         }
 
         if ( towerToHeal )
-        {            
-            StartCoroutine (PrepareForHeal (spell, towerToHeal));
+        {
+            StartCoroutine (PrepareSpell (Constants.HEAL, spell, towerToHeal, null, null, null, null));
             wizard.ManaWaste (spell.cost);
             PrintMessage (spell.spellName);
             return;
-        }      
+        }
 
-        if (!towerToHeal )
+        if ( !towerToHeal )
+        {
             PrintMessage ("Bad attempt!");
+            EndCasting ();
+        }
     }
 
     private GameObject GetBulletPrefab( string bulletName )
@@ -204,98 +221,78 @@ public class AttackManager : MonoBehaviour
         ui.SetMessage (message);
     }
 
-    IEnumerator PrepareForAttack(Spell spell, GameObject bulletPrefab, TowerWizard tower )
-    {
-        isCasting = true;
-        float time = spell.prepareTime;
-        float perc = Time.deltaTime / time * 100;
-        float value = 0;
-        while (time > 0 )
-        {
-            ui.SetPrepareValue (value);
-            time -= Time.deltaTime;
-            value += perc;
-            yield return null;
-        }
-        ui.SetPrepareValue (100);
-        tower.Attack (spell.damage, spell.school, spell.target, bulletPrefab);
-        isCasting = false;
-    }
 
-    IEnumerator PrepareForSlow( Spell spell, TowerWizard tower )
+
+    IEnumerator PrepareSpell( string spellType, Spell spell, Tower tower, Trap trap, TowerWizard towerWizard, GameObject bulletPrefab, List<TowerWizard> atTowers )
     {
-        isCasting = true;
+        Wizard.StopCasting = true;
+        ui.SetPrepareIcon (spell.spellID);
         float time = spell.prepareTime;
         float perc = Time.deltaTime / time * 100;
-        float value = 0; ;
+        float value = 100; ;
         while ( time > 0 )
         {
             ui.SetPrepareValue (value);
             time -= Time.deltaTime;
-            value += perc;
+            value -= perc;
             yield return null;
         }
-        ui.SetPrepareValue (100);
-        tower.SlowEnemyMoving (spell.school, spell.target);
-        isCasting = false;
+        ui.SetPrepareValue (0);
+
+        if ( spellType.Equals (Constants.ATTACK) )
+        {
+            for ( int i = 0; i < attackTowers.Count; i++ )
+            {
+                attackTowers [i].Attack (spell.damage, spell.school, spell.target, bulletPrefab);
+            }
+        }
+        else if ( spellType.Equals (Constants.SLOW) )
+        {
+            towerWizard.SlowEnemyMoving (spell.school, spell.target);
+        }
+        else if ( spellType.Equals (Constants.HEAL) )
+        {
+            if ( tower )
+            {
+                float healPoints = Constants.TOWER_HEAL_POINTS;
+                tower.HealTower (healPoints);
+            }
+            else
+                PrintMessage ("Too late");
+        }
+
+        else if ( spellType.Equals (Constants.RETURN_TOWER) )
+        {
+            if ( tower )
+            {
+                wizard.ManaRecover (tower.cost * PlayerStats.GetPlayerManaReturn () * tower.hp_norm);
+                print ("Return " + (tower.cost * PlayerStats.GetPlayerManaReturn () * tower.hp_norm));
+                tower.TowerDeath ();
+            }
+            else
+                PrintMessage ("No target");
+        }
+
+        else if ( spellType.Equals (Constants.RETURN_TRAP) )
+        {
+            if ( trap )
+            {
+                wizard.ManaRecover (trap.cost * PlayerStats.GetPlayerManaReturn ());
+                print ("Return " + (trap.cost * PlayerStats.GetPlayerManaReturn ()));
+                trap.TowerDeath ();
+            }
+            else
+                PrintMessage ("No target");
+        }
+        EndCasting ();
     }
 
-    IEnumerator PrepareForHeal( Spell spell, Tower tower )
+    private void EndCasting()
     {
-        isCasting = true;
-        float time = spell.prepareTime;
-        float perc = Time.deltaTime / time * 100;
-        float value = 0; ;
-        while ( time > 0 )
-        {
-            ui.SetPrepareValue (value);
-            time -= Time.deltaTime;
-            value += perc;
-            yield return null;
-        }
+        GameEvents.current.CastReset ();
+        castManager.ClearCast ();
+        Wizard.StopCasting = false;
         ui.SetPrepareValue (100);
-        float healPoints = Constants.TOWER_HEAL_POINTS;
-        tower.HealTower (healPoints); ;
-        isCasting = false;
-    }
-
-    IEnumerator PrepareForReturnMana( Spell spell, Tower tower )
-    {        
-        isCasting = true;
-        float time = spell.prepareTime;
-        float perc = Time.deltaTime / time * 100;
-        float value = 0; ;
-        while ( time > 0 )
-        {
-            ui.SetPrepareValue (value);
-            time -= Time.deltaTime;
-            value += perc;
-            yield return null;
-        }
-        ui.SetPrepareValue (100);
-        wizard.ManaRecover (tower.cost * PlayerStats.GetPlayerManaReturn () * tower.hp_norm);
-        print ("Return " + (tower.cost * PlayerStats.GetPlayerManaReturn () * tower.hp_norm));
-        tower.TowerDeath ();
-        isCasting = false;
-    }
-
-    IEnumerator PrepareForReturnMana( Spell spell, Trap trap )
-    {
-        isCasting = true;
-        float time = spell.prepareTime;
-        float perc = Time.deltaTime / time * 100;
-        float value = 0; ;
-        while ( time > 0 )
-        {
-            ui.SetPrepareValue (value);
-            time -= Time.deltaTime;
-            value += perc;
-            yield return null;
-        }
-        ui.SetPrepareValue (100);
-        wizard.ManaRecover (trap.cost * PlayerStats.GetPlayerManaReturn () * trap.hp_norm);
-        print ("Return " + (trap.cost * PlayerStats.GetPlayerManaReturn () * trap.hp_norm));
-        trap.TowerDeath ();
-        isCasting = false;
+        ui.SetDefaultPrepareIcon ();
     }
 }

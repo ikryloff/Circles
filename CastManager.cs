@@ -18,25 +18,40 @@ public class CastManager : MonoBehaviour
 
     public void CastSpell()
     {
-        spellAction.MakeSpell(CastLine);
+        spellAction.MakeSpell (CastLine);
     }
 
     public void DeleteCast()
     {
-        CastLine.Clear();
+        CastLine.Clear ();
         CellsCount = 0;
     }
 
-    public void ReloadCast()
+    public void MakeCast()
     {
-        StartCoroutine (ReloadCastWithDelay());
+        StartCoroutine (MakeCastWithDelay ());
     }
 
-    IEnumerator ReloadCastWithDelay()
+    public void ClearCast()
     {
-        yield return new WaitForSeconds (.2f);
-        CastSpell ();
-        GameEvents.current.CastReset ();
         DeleteCast ();
-    }   
+        GameEvents.current.CastReset ();
+    }
+
+    IEnumerator MakeCastWithDelay()
+    {
+        yield return new WaitForSeconds (.1f);
+        CastSpell ();
+        ColorizeSpell (CastLine);
+    }
+
+    private void ColorizeSpell( List<Cell> castLine )
+    {
+        if ( castLine == null )
+            return;
+        for ( int i = 0; i < castLine.Count; i++ )
+        {
+            castLine [i].ColorCell ();
+        }
+    }
 }

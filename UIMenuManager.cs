@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 public class UIMenuManager : MonoBehaviour
@@ -12,12 +13,14 @@ public class UIMenuManager : MonoBehaviour
     private VisualElement helpPanel;
 
     private Button quit;
+    private Button restart;
     private Button back;
     private Button optionsButton;
     private Button helpButton;
     private Button optionsEngButton;
     private Button optionsRusButton;
 
+    
 
     public void SetRootAndInit( VisualElement _root )
     {
@@ -34,6 +37,7 @@ public class UIMenuManager : MonoBehaviour
         menuPanel = root.Query<VisualElement> ("menu-panel");
 
         quit = root.Query<Button> ("quit");
+        restart = root.Query<Button> ("restart");
         back = root.Query<Button> ("back");
         optionsButton = root.Query<Button> ("options");
         helpButton = root.Query<Button> ("help");
@@ -44,6 +48,7 @@ public class UIMenuManager : MonoBehaviour
         optionsButton.clicked += OpenOptions;
         helpButton.clicked += OpenHelp;
         quit.clicked += QuitGame;
+        restart.clicked += RestartGame;
         optionsEngButton.clicked += SetEnglishLang;
         optionsRusButton.clicked += SetRussianLang;
     }
@@ -53,10 +58,15 @@ public class UIMenuManager : MonoBehaviour
         DontDisplayMenu ();
     }
 
+    public void RestartGame()
+    {
+        Wizard.StopCasting = false;
+        SceneManager.LoadScene (0);
+    }
+
     public void QuitGame()
     {
         Application.Quit ();
-        print ("Quit");
     }
 
     public void ReturnMenu()

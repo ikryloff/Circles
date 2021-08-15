@@ -12,15 +12,21 @@ public class UIManager : MonoBehaviour
     Button speedButton;
     Button spellsButton;
 
+    public static float fontKoef;
+
+    IMGUIContainer prepareIcon;
+
     VisualElement messageScreen;
     VisualElement manaBar;
     VisualElement defenceBar;
     VisualElement prepareBar;
-    VisualElement header;
+    VisualElement gamePanel;
     Label messageLabel;
     Label manaValue;
     Label defenceValue;
+    Label spellsText;
     Label spellsNumber;
+    Label xPText;
     Label xPoints;
     [SerializeField]
     private UIDocument uiGame;
@@ -57,18 +63,26 @@ public class UIManager : MonoBehaviour
         speedButton = rootGameUI.Query<Button> ("speed");
         spellsButton = rootGameUI.Query<Button> ("spells-button");
 
+        prepareIcon = rootGameUI.Query<IMGUIContainer> ("prepare-bar-icon");
 
         messageScreen = rootGameUI.Query<VisualElement> ("message-screen");
         defenceBar = rootGameUI.Query<VisualElement> ("defence-bar-line");
         manaBar = rootGameUI.Query<VisualElement> ("mana-bar-line");
         prepareBar = rootGameUI.Query<VisualElement> ("prepare-bar-line");
-        header = rootGameUI.Query<VisualElement> ("header");
+        gamePanel = rootGameUI.Query<VisualElement> ("game-panel");
 
+        //Labels
         messageLabel = rootGameUI.Query<Label> ("message");
         manaValue = rootGameUI.Query<Label> ("mana-bar-value");
         defenceValue = rootGameUI.Query<Label> ("defence-bar-value");
+        spellsText = rootGameUI.Query<Label> ("spells-txt");
+        FontUtilities.SetFontSize42 (spellsText);
         spellsNumber = rootGameUI.Query<Label> ("spells-number");
+        FontUtilities.SetFontSize42 (spellsNumber);
+        xPText = rootGameUI.Query<Label> ("exp-text");
+        FontUtilities.SetFontSize42 (xPText);
         xPoints = rootGameUI.Query<Label> ("exp-number");
+        FontUtilities.SetFontSize42 (xPoints);
     }
 
 
@@ -86,6 +100,7 @@ public class UIManager : MonoBehaviour
         CleanMessage ();
         PrintSpellsQuantity ();
         SetPrepareValue (100);
+        SetDefaultPrepareIcon ();
     }
 
     public void OpenMenu()
@@ -108,7 +123,7 @@ public class UIManager : MonoBehaviour
 
     IEnumerator Message( string mess )
     {
-        float messTime = 1.5f;
+        float messTime = 2.5f;
         while ( messTime > 0 )
         {
             if ( !messageLabel.text.Equals (mess) )
@@ -119,6 +134,8 @@ public class UIManager : MonoBehaviour
         }
         CleanMessage ();
     }
+
+
 
     public void CleanMessage()
     {
@@ -138,7 +155,7 @@ public class UIManager : MonoBehaviour
             uISpellsManager.HideMagicPanel ();
             spellsButton.style.display = DisplayStyle.Flex;
             messageScreen.style.display = DisplayStyle.Flex;
-            header.style.display = DisplayStyle.Flex;
+            gamePanel.style.display = DisplayStyle.Flex;
             magicPanelIsOn = false;
         }
         else
@@ -147,7 +164,7 @@ public class UIManager : MonoBehaviour
             uISpellsManager.ShowMagicPanel ();
             spellsButton.style.display = DisplayStyle.None;
             messageScreen.style.display = DisplayStyle.None;
-            header.style.display = DisplayStyle.None;
+            gamePanel.style.display = DisplayStyle.None;
             magicPanelIsOn = true;
             uISpellsManager.TurnTab (0);
             uISpellsManager.UpdateSpellBoard ();
@@ -177,17 +194,26 @@ public class UIManager : MonoBehaviour
         xPoints.text = value.ToString ();
     }
 
-    private void StopSpelling()
+    public void StopSpelling()
     {
-        touchController.SetPauseState (true);
+        touchController.SetStopTouching (true);
         timeManager.PauseGameOn ();
     }
     public void StartSpelling()
     {
-        touchController.SetPauseState (false);
         timeManager.PauseGameOff ();
+        touchController.SetStopTouching (false);
     }
 
 
+    public void SetPrepareIcon( int ID )
+    {
+        prepareIcon.style.backgroundImage = GameAssets.instance.GetActiveIconByID (ID);
+    }
+
+    public void SetDefaultPrepareIcon()
+    {
+        prepareIcon.style.backgroundImage = GameAssets.instance.GetEmptyIcon ();
+    }
 
 }

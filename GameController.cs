@@ -6,7 +6,7 @@ public class GameController : MonoBehaviour
     private void Awake()
     {
         // for test
-        PlayerStats.SetPlayerLevel (2);
+        PlayerStats.SetPlayerLevel (1);
 
     }
     private void Start()

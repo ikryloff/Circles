@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Constants 
 {
+    //Camera
+    public static float STANDART_SCREEN_HEIGHT = 12.5f;
+
     // Numbers
     public static float CELL_WIDTH = 1.35f;
     public static float CELL_HEIGHT = 1.125f;
@@ -39,6 +42,8 @@ public class Constants
     public static string BULLET_AE_BULLET = "ae-bullet";
     public static string BLOOD_IMPACT = "bloodImpact";
     public static string CREEP_DEATH = "creepDeath";
+    public static string SUPPRESSION_WIND = "suppressionWind";
+    public static string DEFFENCE_AFFECT = "defenceAffect";
 
     // spell targets
     public static string SPELL_TARGET_RANDOM_IN_LINE = "RIL";
@@ -47,8 +52,11 @@ public class Constants
 
     //special spells
     public static string TOWER_CODE_SHIELD = "1212";
+    public static string TOWER_CODE_WOOD_WALL = "102012012";
+    public static string TOWER_CODE_STONE_WALL = "121212";
     public static string TOWER_CODE_GO_AWAY = "110211020012";
     public static string TOWER_CODE_COME_HERE = "010211020112";
+    public static string TOWER_CODE_MAGIC_LOOP = "1111112";
     public static string SPELL_CODE_SACRIFICE = "110210120112";
     public static string SPELL_CODE_ENCOURAGEMENT = "110210020112";
     public static string SPELL_CODE_SUPPRESSION = "102112012";
@@ -60,5 +68,15 @@ public class Constants
     public static string NECROMANCY = "NECROMANCY";
     public static string DEMONOLOGY = "DEMONOLOGY";
     public static string INFO = "INFORMATION";
+
+    //spellType
+    public static string ATTACK = "ATTACK";
+    public static string SLOW = "SLOW";
+    public static string HEAL = "HEAL";
+    public static string RETURN_TOWER = "RETURN_TOWER";
+    public static string RETURN_TRAP = "RETURN_TRAP";
+    public static string TOWER = "TOWER";
+    public static string BARRIERS = "BARRIERS";
+    public static string TRAP = "TRAP";
 
 }

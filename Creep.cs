@@ -29,6 +29,8 @@ public class Creep : MonoBehaviour, IDamageable
     public GameObject bulletPref;
     public GameObject impactPref;
     public GameObject deathPref;
+    private GameObject suppressionWind;
+    private GameObject defenceAffect;
     private ObjectsHolder oh;
     private SpriteRenderer sprite;
 
@@ -38,14 +40,14 @@ public class Creep : MonoBehaviour, IDamageable
     public HealthBar healthBar;
     private GameObject healthBarGO;
     private XPpoints xpPoints;
-    [SerializeField]
-    private ParticleSystem suppressionWind, defenceAffect;
+    
 
     //private float time;
 
     private void Awake()
     {
-        suppressionWind.Stop ();
+        suppressionWind = GameAssets.instance.GetAssetByString (Constants.SUPPRESSION_WIND);
+        defenceAffect = GameAssets.instance.GetAssetByString (Constants.DEFFENCE_AFFECT);
         creepAnimation = GetComponent<CreepAnimation> ();
         healthBarGO = healthBar.gameObject;
         creepTransform = gameObject.transform;
@@ -67,7 +69,6 @@ public class Creep : MonoBehaviour, IDamageable
         ec.AddCreepToEnemyList (this);
         GetMainTower ();
         GetClosestTower ();
-        //time = Time.time;
     }
 
     void Update()
@@ -102,6 +103,7 @@ public class Creep : MonoBehaviour, IDamageable
         {
             speed = speed / 2;
             isSlow = true;
+            PlaySlowAffect ();
         }
     }
 
@@ -118,10 +120,10 @@ public class Creep : MonoBehaviour, IDamageable
 
     }
 
-    public void PlayAffect()
+    public void PlaySlowAffect()
     {
-        suppressionWind.Play ();
-        defenceAffect.Play ();
+        Instantiate (defenceAffect, creepTransform);        
+        Instantiate (suppressionWind, creepTransform );
     }
 
     public void MoveUp()
@@ -143,6 +145,12 @@ public class Creep : MonoBehaviour, IDamageable
         creepTransform.position = new Vector3 (creepTransform.position.x, creepTransform.position.y - Constants.CELL_HEIGHT, creepTransform.position.z);
         ec.AddCreepToEnemyList (this);
         GetMainTower ();
+    }
+
+    public void MoveBack()
+    {
+        creepTransform.position = new Vector3 (creepTransform.position.x + Constants.CELL_WIDTH * 5, creepTransform.position.y , creepTransform.position.z);
+        GetMainTower ();        
     }
 
     private void CheckHP()

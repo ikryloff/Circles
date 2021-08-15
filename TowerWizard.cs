@@ -53,8 +53,7 @@ public class TowerWizard : Tower
             {
                 if ( creepsInLine [i] != null )
                 {
-                    creepsInLine [i].SetSlowSpeed ();
-                    creepsInLine [i].PlayAffect ();
+                    creepsInLine [i].SetSlowSpeed ();                    
                 }
             }
             return;
@@ -65,7 +64,6 @@ public class TowerWizard : Tower
         if ( targetEnemy && !targetEnemy.IsDead () )
         {
             targetEnemy.SetSlowSpeed ();
-            targetEnemy.PlayAffect ();
         }
         else
             print ("Wrong target!");

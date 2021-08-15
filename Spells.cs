@@ -68,17 +68,16 @@ public class Spells : MonoBehaviour
 
     public void FindAndActivateSpell( string spellCode, int top, int bottom, int left, int right, List<Cell> cells )
     {
-        print (spellCode);
+        if ( Wizard.StopCasting )
+            return;
+        print (spellCode);        
+        Wizard.StopCasting = true;
         Spell spell = GetSpell (spellCode);
         if ( spell != null )
         {
             if ( spell.isTower )
             {
-                if ( spell.isBarrier )
-                {
-                    ExecuteMultipleSpell (spell, cells);
-                }
-                else if ( spell.isTrap )
+                if ( spell.isTrap )
                 {
                     ExecuteTrapSpell (spell, top, left);
                 }
@@ -98,6 +97,8 @@ public class Spells : MonoBehaviour
         else
         {
             PrintMessage ("Unknown spell!!");
+            oh.castManager.ClearCast ();
+            Wizard.StopCasting = false;
         }
     }
 
@@ -142,12 +143,7 @@ public class Spells : MonoBehaviour
         }
         else
             attackManager.AttackEnemies (spell, arr);
-    }
-
-    private void ExecuteMultipleSpell( Spell spell, List<Cell> cells )
-    {
-        buildingManager.BuildBarriers (spell, cells);
-    }
+    }  
 
     public Spell GetSpell( string code )
     {

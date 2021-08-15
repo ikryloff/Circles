@@ -17,7 +17,6 @@ public class TowerAI : Tower
     public GameObject impactPref;
     public GameObject deathPref;
     public Creep targetCreep;
-    public string attackType; // 0 - random, 1 - nearest, 2 - all
 
     private new void Awake()
     {

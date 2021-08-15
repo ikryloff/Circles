@@ -46,6 +46,7 @@ public class UISpellsManager : MonoBehaviour
     Button call7;
 
     Label itemName;
+    Label spellDescription;
 
     IMGUIContainer schemaImg;
 
@@ -90,6 +91,8 @@ public class UISpellsManager : MonoBehaviour
         tabs = new Button [] { info, elem, nature, demonology, necromancy, defence };
 
         itemName = root.Query<Label> ("spells-panel-tab-name");
+        spellDescription = root.Query<Label> ("spell-desc-value");
+        FontUtilities.SetFontSize42 (spellDescription);
 
 
         spell1 = root.Query<Button> ("spell-level1-but");
@@ -122,8 +125,6 @@ public class UISpellsManager : MonoBehaviour
         demonology.clicked += delegate { TurnTab (3); };
         necromancy.clicked += delegate { TurnTab (4); };
         defence.clicked += delegate { TurnTab (5); };
-
-
     }
 
     private void InitSpellButtons()
@@ -159,6 +160,8 @@ public class UISpellsManager : MonoBehaviour
         itemName.text = Localization.GetString(spell.spellTag);
         schemaImg.style.backgroundImage = GameAssets.instance.GetSchemaByID (spell.spellID);
     }
+
+  
 
     private void SpellPanelOn()
     {
@@ -272,7 +275,6 @@ public class UISpellsManager : MonoBehaviour
         }
 
         SetButtonImages ();
-       // UpdateSpellAndCallSchoolBoard (spellsIDList, callsIDList);
     }
 
 

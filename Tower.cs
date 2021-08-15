@@ -18,6 +18,7 @@ public class Tower : MonoBehaviour, IDamageable
     public float hp_norm;
     public float startHp;
     public bool isAI;
+    public bool IsTrap;
     private Cell cell;
 
 
